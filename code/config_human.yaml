@@ -1,0 +1,24 @@
+#Snakemake configuration file human 
+
+#Specify paths to data files
+
+#Paths must end with forward slash
+
+#project directory
+dir_proj:/project2/gilad/briana/comparitive_threeprime/human/
+
+#ref genome directory
+dir_genome: /project2/gilad/briana/genome_anotation_data/comp_genomes/human/
+
+
+#directory with aditional scripts:
+scripts: /project2/gilad/briana/comparitive_threeprime/code
+
+
+# Make sure to also update path for log files in cluster.json
+dir_log: log/
+
+
+#add species label/genome 
+spe: human
+spe_gen: hg38_ucsc.fa

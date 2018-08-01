@@ -1,4 +1,4 @@
-# comparitive_threeprime
+# Comparative three prime seq
 
 A [workflowr][] project.
 

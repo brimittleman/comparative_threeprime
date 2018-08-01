@@ -5,4 +5,6 @@ output:
     toc: false
 ---
 
-Describe your project.
+
+This site will be used to track my analysis in my human chimp comaprative APA project. The first goal is to create a orthologous PAS file that can be used for any comparative work with three primed enriched sequencing.  
+

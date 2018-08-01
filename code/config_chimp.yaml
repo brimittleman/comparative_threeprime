@@ -22,3 +22,4 @@ dir_log: log/
 #add species label  
 spe: chimp
 spe_gen: panTro5.fa  
+spe_lengths: 

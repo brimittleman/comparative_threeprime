@@ -23,7 +23,7 @@ configfile: "config.yaml"
 #species tag
 spe=config["spe"]
 spe_gen=config["spe_gen"]
-
+spe_lengths= config["spe_lengths"]
 
 #Paths for data (end with forward slash)
 dir_proj= config["dir_proj"]
@@ -37,7 +37,7 @@ dir_bed = dir_data + "bed/"
 dir_bedsort= dir_data + "bed_sort/"
 dir_bedgraph= dir_data + "bedgraph/" 
 dir_sortbg= dir_data + "bedgraph_sort/"
-
+dir_bigwig= dir_data + "bigwig/"
 
 
 
@@ -62,8 +62,8 @@ rule all:
        expand(dir_bed +  "{samples}.bed", samples = samples),
        expand(dir_bedsort +  "{samples}-sort.bed", samples = samples),
        expand(dir_bedgraph + "{samples}.bg", samples=samples),
-       expand(dir_sortbg + "{samples}.sort.bg", samples=samples)
-       
+       expand(dir_sortbg + "{samples}.sort.bg", samples=samples),
+       expand(dir_bigwig + "{samples}.bw", samples=samples)
        
        
 rule fastqc:
@@ -130,16 +130,21 @@ rule sort_bed:
 
 rule bedgraph: 
     input:
-        bam = dir_sort + "{samples}-sort.bam"
-    output: dir_bedgraph + "{samples}.bg"
+        bam = dir_sort + "{samples}.spe-sort.bam"
+    output: dir_bedgraph + "{samples}.spe.bg"
     shell: "bedtools genomecov -ibam {input.bam} -bg -5 > {output}"
 
 
 rule sort_bg:
-    input: dir_bedgraph + "{samples}.bg"
-    output: dir_sortbg + "{samples}.sort.bg"
+    input: dir_bedgraph + "{samples}.spe.bg"
+    output: dir_sortbg + "{samples}.spe.sort.bg"
     shell: "sort -k1,1 -k2,2n {input} > {output}"
 
 
-    
+rule bg_to_bw:
+    input:
+        bg= dir_sortbg + "{samples}.spe.sort.bg",
+        len= spe_lengths  
+    output: dir_bigwig + "{samples}.spe.bw"
+    shell: "bedGraphToBigWig {input.bg} {input.len} {output}"
     

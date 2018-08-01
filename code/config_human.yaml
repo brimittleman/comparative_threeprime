@@ -22,4 +22,4 @@ dir_log: log/
 #add species label/genome 
 spe: human
 spe_gen: hg38_ucsc.fa
-spe_lengths: 
+spe_lengths: /project2/gilad/briana/genome_anotation_data/comp_genomes/human/hg38.chrom.sizes  

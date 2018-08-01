@@ -1,0 +1,26 @@
+---
+title: "snakefile_config_notes"
+author: "Briana Mittleman"
+date: "8/1/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+This is where I am keeping notes about my snakefile and config files for the human and chimp processing.  
+
+Genome files: 
+* /project2/gilad/spott/Pipelines/dropseq_pipeline/STAR_indeces/panTro5_UCSC/panTro5.fa  
+
+
+* /project2/gilad/spott/Pipelines/dropseq_pipeline/STAR_indeces/hg38_UCSC/hg38_ucsc.fa 
+
+
+I moved both of these to my genome annotation directroy in comp_genomes. 
+When I build the index I need to use a species variable from the config file. I will also need seperate project directories for each species but the additional scripts can point to the same place. 
+
+
+**Need to add length files to the config files**  

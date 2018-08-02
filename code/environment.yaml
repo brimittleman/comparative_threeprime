@@ -31,7 +31,6 @@ channels:
     - davidaknowles
 
 
-
 dependencies:
     - python
     - pysam
@@ -59,3 +58,4 @@ dependencies:
     - picard >= 2.9.2
     - verifybamid
     - r-leafcutter
+    - ucsc-liftover

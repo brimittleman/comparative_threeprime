@@ -38,6 +38,7 @@ dir_bedsort= dir_data + "bed_sort/"
 dir_bedgraph= dir_data + "bedgraph/" 
 dir_sortbg= dir_data + "bedgraph_sort/"
 dir_bigwig= dir_data + "bigwig/"
+dir_bedgraph_5= dir_data + "bedgraph_5prime"
 
 
 
@@ -63,8 +64,8 @@ rule all:
        expand(dir_bedsort +  "{samples}-sort.bed", samples = samples),
        expand(dir_bedgraph + "{samples}.bg", samples=samples),
        expand(dir_sortbg + "{samples}.sort.bg", samples=samples),
-       expand(dir_bigwig + "{samples}.bw", samples=samples)
-       
+       expand(dir_bigwig + "{samples}.bw", samples=samples),
+       expand(dir_bedgraph_5 + "{samples}.5prime.spe.bg", samples=samples)
        
 rule fastqc:
      input:
@@ -132,8 +133,13 @@ rule bedgraph:
     input:
         bam = dir_sort + "{samples}.spe-sort.bam"
     output: dir_bedgraph + "{samples}.spe.bg"
+    shell: "bedtools genomecov -ibam {input.bam} -bg -split > {output}"
+    
+rule bedgraph_5: 
+    input:
+        bam = dir_sort + "{samples}.spe-sort.bam"
+    output: dir_bedgraph_5 + "{samples}.5prime.spe.bg"
     shell: "bedtools genomecov -ibam {input.bam} -bg -5 > {output}"
-
 
 rule sort_bg:
     input: dir_bedgraph + "{samples}.spe.bg"

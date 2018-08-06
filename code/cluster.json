@@ -32,5 +32,9 @@
 "bedgraph" :
    {
             "mem": 16000
+   },
+"bedgraph_5" :
+   {
+            "mem": 16000
    } 
 }

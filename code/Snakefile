@@ -63,7 +63,7 @@ rule all:
        expand(dir_bed +  "{samples}.bed", samples = samples),
        expand(dir_bedsort +  "{samples}-sort.bed", samples = samples),
        expand(dir_bedgraph + "{samples}.bg", samples=samples),
-       expand(dir_sortbg + "{samples}.sort.bg", samples=samples),
+       expand(dir_sortbg + "{samples}-sort.bg", samples=samples),
        expand(dir_bigwig + "{samples}.bw", samples=samples),
        expand(dir_bedgraph_5 + "{samples}.5prime.bg", samples=samples)
        

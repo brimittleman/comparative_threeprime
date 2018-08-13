@@ -5,7 +5,7 @@
 #Paths must end with forward slash
 
 #project directory
-dir_proj:/project2/gilad/briana/comparitive_threeprime/human/
+dir_proj: /project2/gilad/briana/comparitive_threeprime/human/
 
 #ref genome directory
 dir_genome: /project2/gilad/briana/genome_anotation_data/comp_genomes/human/

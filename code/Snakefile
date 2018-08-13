@@ -27,7 +27,7 @@ spe_lengths= config["spe_lengths"]
 #Paths for data (end with forward slash)
 dir_proj= config["dir_proj"]
 dir_gen=config["dir_genome"]
-output =  "output/"
+output = dir_proj + "output/"
 dir_data= dir_proj + "data/"
 fastq_dir= dir_data + "fastq/"
 fastqc_dir = output + "fastqc/"

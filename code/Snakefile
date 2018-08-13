@@ -99,7 +99,7 @@ rule subjunc:
      
 rule sort_bam:
      input:
-         dir_bam + "{samples}.spe.bam"
+         dir_bam + "{samples}.bam"
      output:
          dir_sort + "{samples}-sort.bam"
      shell: "samtools sort -o {output} {input}"

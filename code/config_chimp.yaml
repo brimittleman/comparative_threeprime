@@ -12,7 +12,7 @@ dir_genome: /project2/gilad/briana/genome_anotation_data/comp_genomes/chimp/
 
 
 #directory with aditional scripts:
-scripts: /project2/gilad/briana/comparitive_threeprime/code
+scripts: /project2/gilad/briana/comparitive_threeprime/code/
 
 
 # Make sure to also update path for log files in cluster.json

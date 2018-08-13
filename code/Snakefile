@@ -38,7 +38,7 @@ dir_bedsort= dir_data + "bed_sort/"
 dir_bedgraph= dir_data + "bedgraph/" 
 dir_sortbg= dir_data + "bedgraph_sort/"
 dir_bigwig= dir_data + "bigwig/"
-dir_bedgraph_5= dir_data + "bedgraph_5prime"
+dir_bedgraph_5= dir_data + "bedgraph_5prime/"
 
 
 

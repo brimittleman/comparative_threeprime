@@ -18,7 +18,6 @@ from snakemake.utils import R
 #Configuration -------------------------------------
 
 
-configfile: "config.yaml"
 
 #species tag
 spe=config["spe"]

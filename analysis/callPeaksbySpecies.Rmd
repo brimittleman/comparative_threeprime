@@ -1,0 +1,68 @@
+---
+title: "Call Peaks by Species"
+author: "Briana Mittleman"
+date: "8/16/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+###Human Peaks  
+
+
+First I will call peaks in the merged human data like I did in https://brimittleman.github.io/threeprimeseq/peak.cov.pipeline.html  
+
+
+* Merge BW  
+
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=mergeBW_H
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=mergeBW_H.out
+#SBATCH --error=mergeBW_H.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=40G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+ls -d -1 /project2/gilad/briana/comparitive_threeprime/human/data/bigwig/* | tail -n +2 > /project2/gilad/briana/comparitive_threeprime/human/data/list_bw/list_of_bigwig.txt
+
+bigWigMerge -inList /project2/gilad/briana/comparitive_threeprime/human/data/list_bw/list_of_bigwig.txt /project2/gilad/briana/comparitive_threeprime/human/data/mergedBW/merged_human-threeprimeseq.bg
+```
+
+
+* Convert to coverage  
+
+
+Copy the bg_to_cov.py to the code directory then run it with.  ERROR HERE!
+
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=run_bgtocov_H
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=run_bgtocov_H.out
+#SBATCH --error=run_bgtocov_H.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load python  
+
+python bg_to_cov.py /project2/gilad/briana/comparitive_threeprime/human/data/mergedBW/merged_human-threeprimeseq.bg /project2/gilad/briana/comparitive_threeprime/human/data/mergedBW/merged_human-threeprimeseq.coverage.txt
+```
+
+
+* sort -k1,1 -k2,2n /project2/gilad/briana/comparitive_threeprime/human/data/mergedBW/merged_human-threeprimeseq.coverage.txt > /project2/gilad/briana/comparitive_threeprime/human/data/mergedBW/merged_human-threeprimeseq.coverage.sort.txt  
+
+
+* Call Peaks  

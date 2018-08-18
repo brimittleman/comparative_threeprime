@@ -346,7 +346,7 @@ div.section {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparitive_threeprime/tree/89d642443ab6d5b67819d0ecb4b00a90dbd0b6e8" target="_blank">89d6424</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparitive_threeprime/tree/356e3d8259000b250532ea4738dfed98ab9ead4d" target="_blank">356e3d8</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Untracked files:
@@ -383,6 +383,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparitive_threeprime/blob/356e3d8259000b250532ea4738dfed98ab9ead4d/analysis/callPeaksbySpecies.Rmd" target="_blank">356e3d8</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-17
+</td>
+<td style="text-align:left;">
+full protocol for HC peaks
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/brimittleman/comparitive_threeprime/50b7e982ac2e15fce5b6a9cdd47cc5a0d09bba0f/docs/callPeaksbySpecies.html" target="_blank">50b7e98</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-17
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 Rmd
@@ -449,6 +483,497 @@ python bg_to_cov.py /project2/gilad/briana/comparitive_threeprime/human/data/mer
 <ul>
 <li><p>sort -k1,1 -k2,2n /project2/gilad/briana/comparitive_threeprime/human/data/mergedBW/merged_human-threeprimeseq.coverage.txt &gt; /project2/gilad/briana/comparitive_threeprime/human/data/mergedBW/merged_human-threeprimeseq.coverage.sort.txt</p></li>
 <li><p>Call Peaks</p></li>
+</ul>
+<p>get_APA_peaks_human.py</p>
+<pre class="bash"><code>def main(inFile, outFile, ctarget):
+    fout = open(outFile,&#39;w&#39;)
+    mincount = 10
+    ov = 20
+    current_peak = []
+    
+    currentChrom = None
+    prevPos = 0
+    for ln in open(inFile):
+        chrom, pos, count = ln.split()
+        chrom= chrom[3:]
+        if chrom != ctarget: continue
+        count = float(count)
+
+        if currentChrom == None:
+            currentChrom = chrom
+            
+        if count == 0 or currentChrom != chrom or int(pos) &gt; prevPos + 1:
+            if len(current_peak) &gt; 0:
+                print (current_peak)
+                M = max([x[1] for x in current_peak])
+                if M &gt; mincount:
+                    all_peaks = refine_peak(current_peak, M, M*0.1,M*0.05)
+                    #refined_peaks = [(x[0][0],x[-1][0], np.mean([y[1] for y in x])) for x in all_peaks]  
+                    rpeaks = [(int(x[0][0])-ov,int(x[-1][0])+ov, np.mean([y[1] for y in x])) for x in all_peaks]
+                    if len(rpeaks) &gt; 1:
+                        for clu in cluster_intervals(rpeaks)[0]:
+                            M = max([x[2] for x in clu])
+                            merging = []
+                            for x in clu:
+                                if x[2] &gt; M *0.5:
+                                    #print x, M
+                                    merging.append(x)
+                            c, s,e,mean =  chrom, min([x[0] for x in merging])+ov, max([x[1] for x in merging])-ov, np.mean([x[2] for x in merging])
+                            #print c,s,e,mean
+                            fout.write(&quot;chr%s\t%d\t%d\t%d\t+\t.\n&quot;%(c,s,e,mean))
+                            fout.flush()
+                    elif len(rpeaks) == 1:
+                        s,e,mean = rpeaks[0]
+                        fout.write(&quot;chr%s\t%d\t%d\t%f\t+\t.\n&quot;%(chrom,s+ov,e-ov,mean))
+                        print(&quot;chr%s&quot;%chrom+&quot;\t%d\t%d\t%f\t+\t.\n&quot;%rpeaks[0])
+                    #print refined_peaks
+            current_peak = [(pos,count)]
+        else:
+            current_peak.append((pos,count))
+        currentChrom = chrom
+        prevPos = int(pos)
+
+def refine_peak(current_peak, M, thresh, noise, minpeaksize=30):
+    
+    cpeak = []
+    opeak = []
+    allcpeaks = []
+    allopeaks = []
+
+    for pos, count in current_peak:
+        if count &gt; thresh:
+            cpeak.append((pos,count))
+            opeak = []
+            continue
+        elif count &gt; noise: 
+            opeak.append((pos,count))
+        else:
+            if len(opeak) &gt; minpeaksize:
+                allopeaks.append(opeak) 
+            opeak = []
+
+        if len(cpeak) &gt; minpeaksize:
+            allcpeaks.append(cpeak)
+            cpeak = []
+        
+    if len(cpeak) &gt; minpeaksize:
+        allcpeaks.append(cpeak)
+    if len(opeak) &gt; minpeaksize:
+        allopeaks.append(opeak)
+
+    allpeaks = allcpeaks
+    for opeak in allopeaks:
+        M = max([x[1] for x in opeak])
+        allpeaks += refine_peak(opeak, M, M*0.3, noise)
+
+    #print [(x[0],x[-1]) for x in allcpeaks], [(x[0],x[-1]) for x in allopeaks], [(x[0],x[-1]) for x in allpeaks]
+    #print &#39;---\n&#39;
+    return(allpeaks)
+
+if __name__ == &quot;__main__&quot;:
+    import numpy as np
+    from misc_helper import *
+    import sys
+
+    chrom = sys.argv[1]
+    inFile = &quot;/project2/gilad/briana/comparitive_threeprime/human/data/mergedBW/merged_human-threeprimeseq.coverage.sort.txt&quot; # &quot;/project2/yangili1/threeprimeseq/gencov/TotalBamFiles.split.genomecov.bed&quot;
+    outFile = &quot;/project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks/APApeaks_human_chr%s.bed&quot;%chrom
+    main(inFile, outFile, chrom)</code></pre>
+<p>run_getpeakYL_human.sh</p>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=run_getpeakYL_human
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=run_getpeakYL_human.out
+#SBATCH --error=run_getpeakYL_human.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate three-prime-env
+
+
+for i in $(seq 1 22); do 
+  python get_APA_peaks_human.py  $i
+done
+</code></pre>
+<ul>
+<li>Combine the peaks</li>
+</ul>
+<p>cat /project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks/*.bed &gt; /project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/APApeaks_merged_allchrom.bed</p>
+<ul>
+<li>Bed to saf</li>
+</ul>
+<p>bed2saf_h.py</p>
+<pre class="bash"><code>from misc_helper import *
+
+fout = file(&quot;/project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/APApeaks_merged_allchrom.SAF&quot;,&#39;w&#39;)
+fout.write(&quot;GeneID\tChr\tStart\tEnd\tStrand\n&quot;)
+for ln in open(&quot;/project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/APApeaks_merged_allchrom.bed&quot;):
+    chrom, start, end, score, strand, score2 = ln.split()
+    chrom=chrom[3:]
+    ID = &quot;peak_%s_%s_%s&quot;%(chrom,start, end)
+    fout.write(&quot;%s\t%s\t%s\t%s\t+\n&quot;%(ID+&quot;_+&quot;, chrom.replace(&quot;chr&quot;,&quot;&quot;), start, end))
+    fout.write(&quot;%s\t%s\t%s\t%s\t-\n&quot;%(ID+&quot;_-&quot;, chrom.replace(&quot;chr&quot;,&quot;&quot;), start, end))
+fout.close()</code></pre>
+<ul>
+<li>Peak Feature count</li>
+</ul>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=peak_fc_h
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=peak_fc_h.out
+#SBATCH --error=peak_fc_h.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate activate comp_threeprime_env
+
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/APApeaks_merged_allchrom.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/APAquant.fc /project2/gilad/briana/comparitive_threeprime/human/data/sort/*-sort.bam -s 1</code></pre>
+<ul>
+<li>Filter peaks</li>
+</ul>
+<p>filter_peaks_human.py</p>
+<pre class="bash"><code>from misc_helper import *
+import numpy as np
+
+fout = file(&quot;/project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom.bed&quot;,&#39;w&#39;)
+
+#cutoffs
+c = 0.9
+caveread = 2
+
+# counters
+fc, fcaveread = 0, 0
+N, Npass = 0, 0
+
+for dic in stream_table(open(&quot;/project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/APAquant.fc&quot;),&#39;\t&#39;):
+    #/project2/gilad/briana/threeprimeseq/data/sort/YL-SP-19239-T-combined-sort.bam
+    #/project2/gilad/briana/comparitive_threeprime/human/data/sort/human_combined_18498_N-sort.bam
+    tot, nuc = [], []
+    for k in dic:
+        if &quot;human&quot; not in k: continue
+        T = k.split(&quot;_&quot;)[-1].split(&quot;-&quot;)[0]
+        if T == &quot;T&quot;:
+            tot.append(int(dic[k]))
+        else:
+            nuc.append(int(dic[k]))
+    totP = tot.count(0)/float(len(tot))
+    nucP = nuc.count(0)/float(len(nuc))
+    N += 1
+    if totP &gt; c and nucP &gt; c:
+        fc += 1
+        continue
+    if max([np.mean(tot),np.mean(nuc)]) &lt;= caveread:
+        fcaveread += 1
+        continue
+    
+    fout.write(&quot;\t&quot;.join([&quot;chr&quot;+dic[&#39;Chr&#39;], dic[&quot;Start&quot;], dic[&quot;End&quot;],str(max([np.mean(tot),np.mean(nuc)])),dic[&quot;Strand&quot;],&quot;.&quot;])+&#39;\n&#39;)
+    Npass += 1
+fout.close()
+    
+
+print(&quot;%d (%.2f%%) did not pass proportion of nonzero cutoff, %d (%.2f%%) did not pass average read cutoff. Total peaks: %d (%.3f%%) of %d peaks remaining&quot;%(fc,float(fc)/N*100, fcaveread, float(fcaveread)/N*100, Npass, 100*Npass/float(N),N))</code></pre>
+<p>run_filter_peaks_human.sh</p>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=filter_peak
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=filet_peak_h.out
+#SBATCH --error=filter_peak_h.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load python  
+
+
+python filter_peaks_human.py</code></pre>
+<ul>
+<li>Name the peaks</li>
+</ul>
+<pre class="bash"><code>x = wc -l /project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom.bed 
+
+seq 1 x &gt; peak.num.txt
+
+paste /project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom.bed  /project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/peak.num.txt | column -s $&#39;\t&#39; -t &gt; temp
+awk &#39;{print $1 &quot;\t&quot; $2 &quot;\t&quot; $3 &quot;\t&quot; $7  &quot;\t&quot;  $4 &quot;\t&quot;  $5 &quot;\t&quot; $6}&#39; temp &gt;   /project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom_named_human.bed </code></pre>
+<p>This will be the bed file I use for the liftover</p>
+</div>
+<div id="chimp-peaks" class="section level3">
+<h3>Chimp Peaks</h3>
+<ul>
+<li>Merge BW</li>
+</ul>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=mergeBW_C
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=mergeBW_C.out
+#SBATCH --error=mergeBW_C.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=40G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+ls -d -1 /project2/gilad/briana/comparitive_threeprime/chimp/data/bigwig/* | tail -n +2 &gt; /project2/gilad/briana/comparitive_threeprime/chimp/data/list_bw/list_of_bigwig.txt
+
+bigWigMerge -inList /project2/gilad/briana/comparitive_threeprime/chimp/data/list_bw/list_of_bigwig.txt /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedBW/merged_chimp-threeprimeseq.bg</code></pre>
+<ul>
+<li>Convert to coverage</li>
+</ul>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=run_bgtocov_C
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=run_bgtocov_C.out
+#SBATCH --error=run_bgtocov_C.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load python  
+
+python bg_to_cov.py /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedBW/merged_chimp-threeprimeseq.bg /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedBW/merged_chimp-threeprimeseq.coverage.txt</code></pre>
+<ul>
+<li><p>sort -k1,1 -k2,2n /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedBW/merged_chimp-threeprimeseq.coverage.txt&gt; /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedBW/merged_chimp-threeprimeseq.coverage.sort.txt</p></li>
+<li><p>Call Peaks</p></li>
+</ul>
+<p>get_APA_peaks_chimp.py</p>
+<pre class="bash"><code>def main(inFile, outFile, ctarget):
+    fout = open(outFile,&#39;w&#39;)
+    mincount = 10
+    ov = 20
+    current_peak = []
+    
+    currentChrom = None
+    prevPos = 0
+    for ln in open(inFile):
+        chrom, pos, count = ln.split()
+        chrom= chrom[3:]
+        if chrom != ctarget: continue
+        count = float(count)
+
+        if currentChrom == None:
+            currentChrom = chrom
+            
+        if count == 0 or currentChrom != chrom or int(pos) &gt; prevPos + 1:
+            if len(current_peak) &gt; 0:
+                print (current_peak)
+                M = max([x[1] for x in current_peak])
+                if M &gt; mincount:
+                    all_peaks = refine_peak(current_peak, M, M*0.1,M*0.05)
+                    #refined_peaks = [(x[0][0],x[-1][0], np.mean([y[1] for y in x])) for x in all_peaks]  
+                    rpeaks = [(int(x[0][0])-ov,int(x[-1][0])+ov, np.mean([y[1] for y in x])) for x in all_peaks]
+                    if len(rpeaks) &gt; 1:
+                        for clu in cluster_intervals(rpeaks)[0]:
+                            M = max([x[2] for x in clu])
+                            merging = []
+                            for x in clu:
+                                if x[2] &gt; M *0.5:
+                                    #print x, M
+                                    merging.append(x)
+                            c, s,e,mean =  chrom, min([x[0] for x in merging])+ov, max([x[1] for x in merging])-ov, np.mean([x[2] for x in merging])
+                            #print c,s,e,mean
+                            fout.write(&quot;chr%s\t%d\t%d\t%d\t+\t.\n&quot;%(c,s,e,mean))
+                            fout.flush()
+                    elif len(rpeaks) == 1:
+                        s,e,mean = rpeaks[0]
+                        fout.write(&quot;chr%s\t%d\t%d\t%f\t+\t.\n&quot;%(chrom,s+ov,e-ov,mean))
+                        print(&quot;chr%s&quot;%chrom+&quot;\t%d\t%d\t%f\t+\t.\n&quot;%rpeaks[0])
+                    #print refined_peaks
+            current_peak = [(pos,count)]
+        else:
+            current_peak.append((pos,count))
+        currentChrom = chrom
+        prevPos = int(pos)
+
+def refine_peak(current_peak, M, thresh, noise, minpeaksize=30):
+    
+    cpeak = []
+    opeak = []
+    allcpeaks = []
+    allopeaks = []
+
+    for pos, count in current_peak:
+        if count &gt; thresh:
+            cpeak.append((pos,count))
+            opeak = []
+            continue
+        elif count &gt; noise: 
+            opeak.append((pos,count))
+        else:
+            if len(opeak) &gt; minpeaksize:
+                allopeaks.append(opeak) 
+            opeak = []
+
+        if len(cpeak) &gt; minpeaksize:
+            allcpeaks.append(cpeak)
+            cpeak = []
+        
+    if len(cpeak) &gt; minpeaksize:
+        allcpeaks.append(cpeak)
+    if len(opeak) &gt; minpeaksize:
+        allopeaks.append(opeak)
+
+    allpeaks = allcpeaks
+    for opeak in allopeaks:
+        M = max([x[1] for x in opeak])
+        allpeaks += refine_peak(opeak, M, M*0.3, noise)
+
+    #print [(x[0],x[-1]) for x in allcpeaks], [(x[0],x[-1]) for x in allopeaks], [(x[0],x[-1]) for x in allpeaks]
+    #print &#39;---\n&#39;
+    return(allpeaks)
+
+if __name__ == &quot;__main__&quot;:
+    import numpy as np
+    from misc_helper import *
+    import sys
+
+    chrom = sys.argv[1]
+    inFile = &quot;/project2/gilad/briana/comparitive_threeprime/chimp/data/mergedBW/merged_chimp-threeprimeseq.coverage.sort.txt&quot; # &quot;/project2/yangili1/threeprimeseq/gencov/TotalBamFiles.split.genomecov.bed&quot;
+    outFile = &quot;/project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks/APApeaks_chimp_chr%s.bed&quot;%chrom
+    main(inFile, outFile, chrom)</code></pre>
+<p>run_getpeakYL_chimp.sh</p>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=run_getpeakYL_C
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=run_getpeakYL_C.out
+#SBATCH --error=run_getpeakYL_C.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate three-prime-env
+
+
+for i in $(seq 1 22); do 
+  python get_APA_peaks_chimp.py  $i
+done
+</code></pre>
+<ul>
+<li>Combine the peaks</li>
+</ul>
+<p>cat /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks/*.bed &gt; /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/APApeaks_merged_allchrom.bed</p>
+<ul>
+<li>Bed to saf</li>
+</ul>
+<p>bed2saf_c.py</p>
+<pre class="bash"><code>from misc_helper import *
+
+fout = file(&quot;/project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/APApeaks_merged_allchrom.SAF&quot;,&#39;w&#39;)
+fout.write(&quot;GeneID\tChr\tStart\tEnd\tStrand\n&quot;)
+for ln in open(&quot;/project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/APApeaks_merged_allchrom.bed&quot;):
+    chrom, start, end, score, strand, score2 = ln.split()
+    chrom=chrom[3:]
+    ID = &quot;peak_%s_%s_%s&quot;%(chrom,start, end)
+    fout.write(&quot;%s\t%s\t%s\t%s\t+\n&quot;%(ID+&quot;_+&quot;, chrom.replace(&quot;chr&quot;,&quot;&quot;), start, end))
+    fout.write(&quot;%s\t%s\t%s\t%s\t-\n&quot;%(ID+&quot;_-&quot;, chrom.replace(&quot;chr&quot;,&quot;&quot;), start, end))
+fout.close()</code></pre>
+<ul>
+<li>Peak Feature count<br />
+peak_fc_c.sh</li>
+</ul>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=peak_fc_c
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=peak_fc_c.out
+#SBATCH --error=peak_fc_c.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate activate comp_threeprime_env
+
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/APApeaks_merged_allchrom.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/APAquant.fc /project2/gilad/briana/comparitive_threeprime/chimp/data/sort/*-sort.bam -s 1</code></pre>
+<ul>
+<li>Filter peaks</li>
+</ul>
+<p>filter_peaks_chimp.py</p>
+<pre class="bash"><code>from misc_helper import *
+import numpy as np
+
+fout = file(&quot;/project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom.bed&quot;,&#39;w&#39;)
+
+#cutoffs
+c = 0.9
+caveread = 2
+
+# counters
+fc, fcaveread = 0, 0
+N, Npass = 0, 0
+
+for dic in stream_table(open(&quot;/project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/APAquant.fc&quot;),&#39;\t&#39;):
+    tot, nuc = [], []
+    for k in dic:
+        if &quot;chimp&quot; not in k: continue
+        T = k.split(&quot;_&quot;)[-1].split(&quot;-&quot;)[0]
+        if T == &quot;T&quot;:
+            tot.append(int(dic[k]))
+        else:
+            nuc.append(int(dic[k]))
+    totP = tot.count(0)/float(len(tot))
+    nucP = nuc.count(0)/float(len(nuc))
+    N += 1
+    if totP &gt; c and nucP &gt; c:
+        fc += 1
+        continue
+    if max([np.mean(tot),np.mean(nuc)]) &lt;= caveread:
+        fcaveread += 1
+        continue
+    
+    fout.write(&quot;\t&quot;.join([&quot;chr&quot;+dic[&#39;Chr&#39;], dic[&quot;Start&quot;], dic[&quot;End&quot;],str(max([np.mean(tot),np.mean(nuc)])),dic[&quot;Strand&quot;],&quot;.&quot;])+&#39;\n&#39;)
+    Npass += 1
+fout.close()
+    
+
+print(&quot;%d (%.2f%%) did not pass proportion of nonzero cutoff, %d (%.2f%%) did not pass average read cutoff. Total peaks: %d (%.3f%%) of %d peaks remaining&quot;%(fc,float(fc)/N*100, fcaveread, float(fcaveread)/N*100, Npass, 100*Npass/float(N),N))</code></pre>
+<p>run_filter_peaks_chimp.sh</p>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=filter_peak_C
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=filet_peak_C.out
+#SBATCH --error=filter_peak_C.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load python  
+
+
+python filter_peaks_chimp.py</code></pre>
+<ul>
+<li>Name the peaks</li>
+</ul>
+<pre class="bash"><code>x = wc -l /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom.bed 
+
+seq 1 x &gt; peak.num.txt
+
+paste /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom.bed  /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/peak.num.txt | column -s $&#39;\t&#39; -t &gt; temp
+awk &#39;{print $1 &quot;\t&quot; $2 &quot;\t&quot; $3 &quot;\t&quot; $7  &quot;\t&quot;  $4 &quot;\t&quot;  $5 &quot;\t&quot; $6}&#39; temp &gt;   /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom_named_chimp.bed </code></pre>
+<p>The final files are:</p>
+<ul>
+<li><p>/project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom_named_human.bed</p></li>
+<li><p>/project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom_named_chimp.bed</p></li>
 </ul>
 </div>
 <div id="session-information" class="section level2">

@@ -490,7 +490,7 @@ run_getpeakYL_chimp.sh
 #SBATCH --mail-type=END
 
 module load Anaconda3
-source activate three-prime-env
+source activate comp_threeprime_env
 
 
 for i in $(seq 1 22); do 

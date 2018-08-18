@@ -1,0 +1,78 @@
+---
+title: "liftover_pipeline"
+author: "Briana Mittleman"
+date: "8/1/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I will use this analysis to create a pipeline I can use to liftover the peaks once I get them from the human and chimp three prime seq data.  
+
+##Download files 
+
+
+Tool to add to conda environment:  
+
+* ucsc-liftover  
+
+Chain file from UCSC:  
+
+* /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/hg38ToPanTro5.over.chain.gz  
+
+* /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/panTro5ToHg38.over.chain.gz  
+
+##Prepare the bed files
+
+I want the bed files with the peaks to be in the folowing format:  
+
+chr# start end species_peakname
+
+Resulting bed files will go in: /project2/gilad/briana/comparitive_threeprime/data/liftover
+
+To go from the peak bed file created in the callPeaksbySpecies analysis I need to cut the file to the first four columns and add the species name to the peak.  
+
+```{bash, eval=F}
+awk '{print $1 "\t" $2 "\t" $3 "\t" "human_"$4}' /project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom_named_human.bed > /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeaks.bed
+```
+
+
+```{bash, eval=F}
+awk '{print $1 "\t" $2 "\t" $3 "\t" "chimp_"$4}' /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom_named_chimp.bed > /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.bed
+```
+
+##Run liftover  
+
+Run liftOver with 'liftOver input.bed hg18ToHg19.over.chain.gz output.bed unlifted.bed' I want to run it both direction. I will then lift back.   
+
+
+LiftForward.sh
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=LiftForward
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=LiftForward.out
+#SBATCH --error=LiftForward.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=16G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+#human to chimp
+liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeaks.bed /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/hg38ToPanTro5.over.chain.gz /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeakslifted.bed /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeaksunlifted.bed
+ 
+
+#chimp to human 
+liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.bed /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/panTro5ToHg38.over.chain.gz /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.lifted.bed /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.unlifted.bed
+```
+
+
+
+
+

@@ -1,0 +1,84 @@
+---
+title: "Characterize orthologous peaks"
+author: "Briana Mittleman"
+date: "8/21/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I will use this analysis for QC on the orthologous peaks called in the liftover pipeline analysis.  
+
+##Distance to ortho exon 
+
+I want to make sure the distances of the orthologous peaks to the nearest exon called in Bryans ortho exon files follow a similar distribution.  
+
+The orthologus exon files are in /project2/gilad/briana/genome_anotation_data/ortho_exon and the small version have just chr start end and exon name.  
+
+The ortho peak files are in /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/  
+
+I want the closest exon upstream, i will use bedtools closest:  
+
+distUpstreamexon.sh
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=disUpstreamexon
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=disUpstreamexon.out
+#SBATCH --error=disUpstreamexon.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.bed  -b /project2/gilad/briana/genome_anotation_data/ortho_exon/2017_July_ortho_chimp.small.sort.bed > /project2/gilad/briana/comparitive_threeprime/data/dist_upexon/Chimp.distUpstreamexon.txt
+
+
+bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.bed -b /project2/gilad/briana/genome_anotation_data/ortho_exon/2017_July_ortho_human.small.sort.bed > /project2/gilad/briana/comparitive_threeprime/data/dist_upexon/Human.distUpstreamexon.txt
+```
+
+Import the files and plot the distances.  
+
+```{r}
+library(tidyverse)
+library(workflowr)
+library(cowplot)
+```
+
+
+
+
+```{r}
+getwd()
+file.exists("../data/dist_upexon/Chimp.distUpstreamexon.txt")
+chimp_dist=read.table("../data/dist_upexon/Chimp.distUpstreamexon.txt", col.names = c("peak_chr", "peak_start", "peak_end", "peak_name", "exon_chr", "exon_start", "exon_end", "exon_name", "dist"), stringsAsFactors = F) %>% mutate(logdis=log10(abs(dist) +1 ))
+
+human_dist=read.table("../data/dist_upexon/Human.distUpstreamexon.txt", col.names = c("peak_chr", "peak_start", "peak_end", "peak_name", "exon_chr", "exon_start", "exon_end", "exon_name", "dist"),stringsAsFactors = F, skip=1) %>% mutate(logdis=log10(abs(dist) +1 ))
+
+
+
+
+```
+
+
+
+```{r}
+
+
+ch=ggplot(chimp_dist, aes(x=logdis)) + geom_density() + labs(x="log10 abs.value \n distance +1 ", title="Chimp distance to ortho exon")
+
+hu=ggplot(human_dist, aes(x=logdis)) + geom_density()+ labs(x="log10 abs.value \n distance +1 ", title="Human distance to ortho exon")
+
+
+plot_grid(ch, hu)
+```
+
+This is a good sanity check. The distributions are similar.  
+

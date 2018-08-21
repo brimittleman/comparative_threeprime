@@ -75,4 +75,134 @@ liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_ch
 
 
 
+LiftReverse.sh  
+
+Now the lifted human peaks are on chimp cordinates and vise-versa. I will lift back over.  
+
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=LiftReverse
+#SBATCH --time=24:00:00
+#SBATCH --output=LiftReverse.out
+#SBATCH --error=LiftReverse.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=16G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+
+#human to chimp back to human
+liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeakslifted.bed /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/panTro5ToHg38.over.chain.gz /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeakslifted_reverse.bed /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeaksunlifted.reverse.bed
+
+#chimp to human back to chimp
+liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.lifted.bed /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/hg38ToPanTro5.over.chain.gz /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.lifted.reverse.bed /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.unlifted.reverse.bed
+
+```
+
+LiftFinal.sh 
+
+I now have lifted back and I want to go forward one more time to get the final list i should use.  
+
+
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=LiftFinal
+#SBATCH --time=24:00:00
+#SBATCH --output=LiftFinal.out
+#SBATCH --error=LiftFinal.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=16G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+
+#human to chimp back to human - final lift to chimp
+liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeakslifted_reverse.bed /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/hg38ToPanTro5.over.chain.gz /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeakslifted_reverse.finalCcords.bed /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeaksunlifted.reverse.final.bed
+
+
+#chimp to human back to chimp- final lift to human
+liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.lifted.reverse.bed /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/panTro5ToHg38.over.chain.gz /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.lifted.reverse.finalHcords.bed /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.unlifted.reverse.final.bed
+
+```
+
+
+-change min percentage
+
+
+The final lifted files have 350111 peaks that lifted from chimp to human and 442100 peaks that lifter human to chimp. I next will find the intersection of these files for the final list. In order to do this I need to create files that have the coordinates in human and in chimp. I can do this using the reverse file and final file.  
+
+
+##Process results  
+
+###human peaks  
+
+```{r}
+library(dplyr)
+library(workflowr)
+```
+
+
+```{r}
+#human rev is in human coordinates 
+human_rev= read.table("../data/liftover/filtered_humanPeakslifted_reverse.bed", col.names = c("human_chr", "human_start", "human_end", "name"), stringsAsFactors = F)
+
+#final coords are in chimp coordinates  
+human_lifted=read.table("../data/liftover/filtered_humanPeakslifted_reverse.finalCcords.bed", col.names = c("chimp_chr", "chimp_start", "chimp_end", "name"), stringsAsFactors = F)
+```
+
+
+I want to join these files by the name of the peaks keeping only the peaks that are in the final lifted.  
+
+```{r}
+human_final=human_lifted %>% left_join(human_rev, by="name")
+```
+
+###Chimp peaks  
+
+```{r}
+#chimp rev in chimp cords  
+
+chimp_rev=read.table("../data/liftover/filtered_chimpPeaks.lifted.reverse.bed", col.names = c("chimp_chr", "chimp_start", "chimp_end", "name"), stringsAsFactors = F)
+
+#final chimp lift is in human coords  
+
+chimp_lifted=read.table("../data/liftover/filtered_chimpPeaks.lifted.reverse.finalHcords.bed", col.names=c( "human_chr", "human_start", "human_end", "name"),stringsAsFactors = F )
+```
+
+
+Join the files  
+
+```{r}
+chimp_final=chimp_lifted %>% left_join(chimp_rev, by="name")
+```
+
+
+
+###Intersection of reciprocal liftover  
+```{r}
+union_peaks=human_final %>% inner_join(chimp_final, by=c("human_chr", "human_start", "human_end", "chimp_chr", "chimp_start", "chimp_end" ))
+```
+This leaves `r nrow(union_peaks)` 
+
+
+I can then seperate these and write out the bedfile. With that I can look at metrics such as how many per gene or distance to last exon.  
+
+```{r}
+human_ortho= union_peaks %>% select(human_chr, human_start, human_end, name.x) 
+chimp_ortho= union_peaks %>% select(chimp_chr, chimp_start, chimp_end, name.y)
+```
+
+
+Write these:  
+```{r, eval=F}
+write.table(human_ortho, file="../data/liftover/humanOrthoPeaks.bed", quote = F, row.names = F, col.names = F,sep="\t")
+write.table(chimp_ortho, file="../data/liftover/chimpOrthoPeaks.bed", quote= F, row.names = F, col.names = F, sep="\t")
+```
+
 

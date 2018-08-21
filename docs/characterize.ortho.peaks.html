@@ -12,7 +12,7 @@
 <meta name="author" content="Briana Mittleman" />
 
 
-<title>liftover_pipeline</title>
+<title>Characterize orthologous peaks</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -315,9 +315,9 @@ div.section {
 
 
 
-<h1 class="title toc-ignore">liftover_pipeline</h1>
+<h1 class="title toc-ignore">Characterize orthologous peaks</h1>
 <h4 class="author"><em>Briana Mittleman</em></h4>
-<h4 class="date"><em>8/1/2018</em></h4>
+<h4 class="date"><em>8/21/2018</em></h4>
 
 </div>
 
@@ -370,226 +370,68 @@ Unstaged changes:
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes. </details>
 </li>
 </ul>
-<details> <summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
-<ul>
-<table style="border-collapse:separate; border-spacing:5px;">
-<thead>
-<tr>
-<th style="text-align:left;">
-File
-</th>
-<th style="text-align:left;">
-Version
-</th>
-<th style="text-align:left;">
-Author
-</th>
-<th style="text-align:left;">
-Date
-</th>
-<th style="text-align:left;">
-Message
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-Rmd
-</td>
-<td style="text-align:left;">
-<a href="https://github.com/brimittleman/comparative_threeprime/blob/843d7d158052d7015b88aeaacc7470102a6b5b6f/analysis/liftover_pipeline.Rmd" target="_blank">843d7d1</a>
-</td>
-<td style="text-align:left;">
-brimittleman
-</td>
-<td style="text-align:left;">
-2018-08-21
-</td>
-<td style="text-align:left;">
-update based on knitr profile
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-html
-</td>
-<td style="text-align:left;">
-<a href="https://cdn.rawgit.com/brimittleman/comparative_threeprime/7bdbd4879a6dc220e9bdad9d025028dadb50e936/docs/liftover_pipeline.html" target="_blank">7bdbd48</a>
-</td>
-<td style="text-align:left;">
-brimittleman
-</td>
-<td style="text-align:left;">
-2018-08-17
-</td>
-<td style="text-align:left;">
-Build site.
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Rmd
-</td>
-<td style="text-align:left;">
-<a href="https://github.com/brimittleman/comparative_threeprime/blob/392aed91236f58fd34f66fd6ea55d135450b4545/analysis/liftover_pipeline.Rmd" target="_blank">392aed9</a>
-</td>
-<td style="text-align:left;">
-brimittleman
-</td>
-<td style="text-align:left;">
-2018-08-17
-</td>
-<td style="text-align:left;">
-lift code and add to index
-</td>
-</tr>
-</tbody>
-</table>
-</ul>
-<p></details></p>
 <hr />
-<p>I will use this analysis to create a pipeline I can use to liftover the peaks once I get them from the human and chimp three prime seq data.</p>
-<div id="download-files" class="section level2">
-<h2>Download files</h2>
-<p>Tool to add to conda environment:</p>
-<ul>
-<li>ucsc-liftover</li>
-</ul>
-<p>Chain file from UCSC:</p>
-<ul>
-<li><p>/project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/hg38ToPanTro5.over.chain.gz</p></li>
-<li><p>/project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/panTro5ToHg38.over.chain.gz</p></li>
-</ul>
-</div>
-<div id="prepare-the-bed-files" class="section level2">
-<h2>Prepare the bed files</h2>
-<p>I want the bed files with the peaks to be in the folowing format:</p>
-<p>chr# start end species_peakname</p>
-<p>Resulting bed files will go in: /project2/gilad/briana/comparitive_threeprime/data/liftover</p>
-<p>To go from the peak bed file created in the callPeaksbySpecies analysis I need to cut the file to the first four columns and add the species name to the peak.</p>
-<pre class="bash"><code>awk &#39;{print $1 &quot;\t&quot; $2 &quot;\t&quot; $3 &quot;\t&quot; &quot;human_&quot;$4}&#39; /project2/gilad/briana/comparitive_threeprime/human/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom_named_human.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeaks.bed</code></pre>
-<pre class="bash"><code>awk &#39;{print $1 &quot;\t&quot; $2 &quot;\t&quot; $3 &quot;\t&quot; &quot;chimp_&quot;$4}&#39; /project2/gilad/briana/comparitive_threeprime/chimp/data/mergedPeaks_comb/filtered_APApeaks_merged_allchrom_named_chimp.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.bed</code></pre>
-</div>
-<div id="run-liftover" class="section level2">
-<h2>Run liftover</h2>
-<p>Run liftOver with ‘liftOver input.bed hg18ToHg19.over.chain.gz output.bed unlifted.bed’ I want to run it both direction. I will then lift back.</p>
-<p>LiftForward.sh</p>
+<p>I will use this analysis for QC on the orthologous peaks called in the liftover pipeline analysis.</p>
+<div id="distance-to-ortho-exon" class="section level2">
+<h2>Distance to ortho exon</h2>
+<p>I want to make sure the distances of the orthologous peaks to the nearest exon called in Bryans ortho exon files follow a similar distribution.</p>
+<p>The orthologus exon files are in /project2/gilad/briana/genome_anotation_data/ortho_exon and the small version have just chr start end and exon name.</p>
+<p>The ortho peak files are in /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/</p>
+<p>I want the closest exon upstream, i will use bedtools closest:</p>
+<p>distUpstreamexon.sh</p>
 <pre class="bash"><code>#!/bin/bash
 
-#SBATCH --job-name=LiftForward
+#SBATCH --job-name=disUpstreamexon
 #SBATCH --account=pi-yangili1
 #SBATCH --time=24:00:00
-#SBATCH --output=LiftForward.out
-#SBATCH --error=LiftForward.err
+#SBATCH --output=disUpstreamexon.out
+#SBATCH --error=disUpstreamexon.err
 #SBATCH --partition=broadwl
-#SBATCH --mem=16G
+#SBATCH --mem=12G
 #SBATCH --mail-type=END
+
 
 module load Anaconda3
 source activate comp_threeprime_env
 
-#human to chimp
-liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeaks.bed /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/hg38ToPanTro5.over.chain.gz /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeakslifted.bed /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeaksunlifted.bed
- 
-
-#chimp to human 
-liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.bed /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/panTro5ToHg38.over.chain.gz /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.lifted.bed /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.unlifted.bed</code></pre>
-<p>LiftReverse.sh</p>
-<p>Now the lifted human peaks are on chimp cordinates and vise-versa. I will lift back over.</p>
-<pre class="bash"><code>#!/bin/bash
-
-#SBATCH --job-name=LiftReverse
-#SBATCH --time=24:00:00
-#SBATCH --output=LiftReverse.out
-#SBATCH --error=LiftReverse.err
-#SBATCH --partition=broadwl
-#SBATCH --mem=16G
-#SBATCH --mail-type=END
-
-module load Anaconda3
-source activate comp_threeprime_env
+bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.bed  -b /project2/gilad/briana/genome_anotation_data/ortho_exon/2017_July_ortho_chimp.small.sort.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/dist_upexon/Chimp.distUpstreamexon.txt
 
 
-#human to chimp back to human
-liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeakslifted.bed /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/panTro5ToHg38.over.chain.gz /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeakslifted_reverse.bed /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeaksunlifted.reverse.bed
-
-#chimp to human back to chimp
-liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.lifted.bed /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/hg38ToPanTro5.over.chain.gz /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.lifted.reverse.bed /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.unlifted.reverse.bed
-</code></pre>
-<p>LiftFinal.sh</p>
-<p>I now have lifted back and I want to go forward one more time to get the final list i should use.</p>
-<pre class="bash"><code>#!/bin/bash
-
-#SBATCH --job-name=LiftFinal
-#SBATCH --time=24:00:00
-#SBATCH --output=LiftFinal.out
-#SBATCH --error=LiftFinal.err
-#SBATCH --partition=broadwl
-#SBATCH --mem=16G
-#SBATCH --mail-type=END
-
-module load Anaconda3
-source activate comp_threeprime_env
-
-
-#human to chimp back to human - final lift to chimp
-liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeakslifted_reverse.bed /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/hg38ToPanTro5.over.chain.gz /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeakslifted_reverse.finalCcords.bed /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_humanPeaksunlifted.reverse.final.bed
-
-
-#chimp to human back to chimp- final lift to human
-liftOver /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.lifted.reverse.bed /project2/gilad/briana/genome_anotation_data/comp_genomes/liftover/panTro5ToHg38.over.chain.gz /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.lifted.reverse.finalHcords.bed /project2/gilad/briana/comparitive_threeprime/data/liftover/filtered_chimpPeaks.unlifted.reverse.final.bed
-</code></pre>
-<p>-change min percentage</p>
-<p>The final lifted files have 350111 peaks that lifted from chimp to human and 442100 peaks that lifter human to chimp. I next will find the intersection of these files for the final list. In order to do this I need to create files that have the coordinates in human and in chimp. I can do this using the reverse file and final file.</p>
-</div>
-<div id="process-results" class="section level2">
-<h2>Process results</h2>
-<div id="human-peaks" class="section level3">
-<h3>human peaks</h3>
-<pre class="r"><code>library(dplyr)</code></pre>
-<pre><code>
-Attaching package: &#39;dplyr&#39;</code></pre>
-<pre><code>The following objects are masked from &#39;package:stats&#39;:
-
-    filter, lag</code></pre>
-<pre><code>The following objects are masked from &#39;package:base&#39;:
-
-    intersect, setdiff, setequal, union</code></pre>
+bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.bed -b /project2/gilad/briana/genome_anotation_data/ortho_exon/2017_July_ortho_human.small.sort.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/dist_upexon/Human.distUpstreamexon.txt</code></pre>
+<p>Import the files and plot the distances.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>── Attaching packages ──────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>✔ ggplot2 3.0.0     ✔ purrr   0.2.5
+✔ tibble  1.4.2     ✔ dplyr   0.7.6
+✔ tidyr   0.8.1     ✔ stringr 1.3.1
+✔ readr   1.1.1     ✔ forcats 0.3.0</code></pre>
+<pre><code>── Conflicts ─────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(workflowr)</code></pre>
 <pre><code>This is workflowr version 1.1.1
 Run ?workflowr for help getting started</code></pre>
-<pre class="r"><code>#human rev is in human coordinates 
-human_rev= read.table(&quot;../data/liftover/filtered_humanPeakslifted_reverse.bed&quot;, col.names = c(&quot;human_chr&quot;, &quot;human_start&quot;, &quot;human_end&quot;, &quot;name&quot;), stringsAsFactors = F)
+<pre class="r"><code>library(cowplot)</code></pre>
+<pre><code>
+Attaching package: &#39;cowplot&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:ggplot2&#39;:
 
-#final coords are in chimp coordinates  
-human_lifted=read.table(&quot;../data/liftover/filtered_humanPeakslifted_reverse.finalCcords.bed&quot;, col.names = c(&quot;chimp_chr&quot;, &quot;chimp_start&quot;, &quot;chimp_end&quot;, &quot;name&quot;), stringsAsFactors = F)</code></pre>
-<p>I want to join these files by the name of the peaks keeping only the peaks that are in the final lifted.</p>
-<pre class="r"><code>human_final=human_lifted %&gt;% left_join(human_rev, by=&quot;name&quot;)</code></pre>
-</div>
-<div id="chimp-peaks" class="section level3">
-<h3>Chimp peaks</h3>
-<pre class="r"><code>#chimp rev in chimp cords  
+    ggsave</code></pre>
+<pre class="r"><code>getwd()</code></pre>
+<pre><code>[1] &quot;/Users/bmittleman1/Documents/Gilad_lab/comparitive_threeprime/com_threeprime/analysis&quot;</code></pre>
+<pre class="r"><code>file.exists(&quot;../data/dist_upexon/Chimp.distUpstreamexon.txt&quot;)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<pre class="r"><code>chimp_dist=read.table(&quot;../data/dist_upexon/Chimp.distUpstreamexon.txt&quot;, col.names = c(&quot;peak_chr&quot;, &quot;peak_start&quot;, &quot;peak_end&quot;, &quot;peak_name&quot;, &quot;exon_chr&quot;, &quot;exon_start&quot;, &quot;exon_end&quot;, &quot;exon_name&quot;, &quot;dist&quot;), stringsAsFactors = F) %&gt;% mutate(logdis=log10(abs(dist) +1 ))
 
-chimp_rev=read.table(&quot;../data/liftover/filtered_chimpPeaks.lifted.reverse.bed&quot;, col.names = c(&quot;chimp_chr&quot;, &quot;chimp_start&quot;, &quot;chimp_end&quot;, &quot;name&quot;), stringsAsFactors = F)
+human_dist=read.table(&quot;../data/dist_upexon/Human.distUpstreamexon.txt&quot;, col.names = c(&quot;peak_chr&quot;, &quot;peak_start&quot;, &quot;peak_end&quot;, &quot;peak_name&quot;, &quot;exon_chr&quot;, &quot;exon_start&quot;, &quot;exon_end&quot;, &quot;exon_name&quot;, &quot;dist&quot;),stringsAsFactors = F, skip=1) %&gt;% mutate(logdis=log10(abs(dist) +1 ))</code></pre>
+<pre class="r"><code>ch=ggplot(chimp_dist, aes(x=logdis)) + geom_density() + labs(x=&quot;log10 abs.value \n distance +1 &quot;, title=&quot;Chimp distance to ortho exon&quot;)
 
-#final chimp lift is in human coords  
+hu=ggplot(human_dist, aes(x=logdis)) + geom_density()+ labs(x=&quot;log10 abs.value \n distance +1 &quot;, title=&quot;Human distance to ortho exon&quot;)
 
-chimp_lifted=read.table(&quot;../data/liftover/filtered_chimpPeaks.lifted.reverse.finalHcords.bed&quot;, col.names=c( &quot;human_chr&quot;, &quot;human_start&quot;, &quot;human_end&quot;, &quot;name&quot;),stringsAsFactors = F )</code></pre>
-<p>Join the files</p>
-<pre class="r"><code>chimp_final=chimp_lifted %&gt;% left_join(chimp_rev, by=&quot;name&quot;)</code></pre>
-</div>
-<div id="intersection-of-reciprocal-liftover" class="section level3">
-<h3>Intersection of reciprocal liftover</h3>
-<pre class="r"><code>union_peaks=human_final %&gt;% inner_join(chimp_final, by=c(&quot;human_chr&quot;, &quot;human_start&quot;, &quot;human_end&quot;, &quot;chimp_chr&quot;, &quot;chimp_start&quot;, &quot;chimp_end&quot; ))</code></pre>
-<p>This leaves 76207</p>
-<p>I can then seperate these and write out the bedfile. With that I can look at metrics such as how many per gene or distance to last exon.</p>
-<pre class="r"><code>human_ortho= union_peaks %&gt;% select(human_chr, human_start, human_end, name.x) 
-chimp_ortho= union_peaks %&gt;% select(chimp_chr, chimp_start, chimp_end, name.y)</code></pre>
-<p>Write these:</p>
-<pre class="r"><code>write.table(human_ortho, file=&quot;../data/liftover/humanOrthoPeaks.bed&quot;, quote = F, row.names = F, col.names = F,sep=&quot;\t&quot;)
-write.table(chimp_ortho, file=&quot;../data/liftover/chimpOrthoPeaks.bed&quot;, quote= F, row.names = F, col.names = F, sep=&quot;\t&quot;)</code></pre>
-</div>
+
+plot_grid(ch, hu)</code></pre>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This is a good sanity check. The distributions are similar.</p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
@@ -609,20 +451,28 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] workflowr_1.1.1 dplyr_0.7.6    
+ [1] bindrcpp_0.2.2  cowplot_0.9.3   workflowr_1.1.1 forcats_0.3.0  
+ [5] stringr_1.3.1   dplyr_0.7.6     purrr_0.2.5     readr_1.1.1    
+ [9] tidyr_0.8.1     tibble_1.4.2    ggplot2_3.0.0   tidyverse_1.2.1
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.18      knitr_1.20        bindr_0.1.1      
- [4] whisker_0.3-2     magrittr_1.5      tidyselect_0.2.4 
- [7] R6_2.2.2          rlang_0.2.1       stringr_1.3.1    
-[10] tools_3.5.1       R.oo_1.22.0       git2r_0.23.0     
-[13] htmltools_0.3.6   yaml_2.1.19       rprojroot_1.3-2  
-[16] digest_0.6.15     assertthat_0.2.0  tibble_1.4.2     
-[19] crayon_1.3.4      bindrcpp_0.2.2    purrr_0.2.5      
-[22] R.utils_2.6.0     glue_1.3.0        evaluate_0.11    
-[25] rmarkdown_1.10    stringi_1.2.4     pillar_1.3.0     
-[28] compiler_3.5.1    backports_1.1.2   R.methodsS3_1.7.1
-[31] pkgconfig_2.0.1  </code></pre>
+ [1] tidyselect_0.2.4  haven_1.1.2       lattice_0.20-35  
+ [4] colorspace_1.3-2  htmltools_0.3.6   yaml_2.1.19      
+ [7] rlang_0.2.1       R.oo_1.22.0       pillar_1.3.0     
+[10] glue_1.3.0        withr_2.1.2       R.utils_2.6.0    
+[13] modelr_0.1.2      readxl_1.1.0      bindr_0.1.1      
+[16] plyr_1.8.4        munsell_0.5.0     gtable_0.2.0     
+[19] cellranger_1.1.0  rvest_0.3.2       R.methodsS3_1.7.1
+[22] evaluate_0.11     labeling_0.3      knitr_1.20       
+[25] broom_0.5.0       Rcpp_0.12.18      scales_0.5.0     
+[28] backports_1.1.2   jsonlite_1.5      hms_0.4.2        
+[31] digest_0.6.15     stringi_1.2.4     grid_3.5.1       
+[34] rprojroot_1.3-2   cli_1.0.0         tools_3.5.1      
+[37] magrittr_1.5      lazyeval_0.2.1    crayon_1.3.4     
+[40] whisker_0.3-2     pkgconfig_2.0.1   xml2_1.2.0       
+[43] lubridate_1.7.4   assertthat_0.2.0  rmarkdown_1.10   
+[46] httr_1.3.1        rstudioapi_0.7    R6_2.2.2         
+[49] nlme_3.1-137      git2r_0.23.0      compiler_3.5.1   </code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using

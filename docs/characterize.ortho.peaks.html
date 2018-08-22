@@ -322,7 +322,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-08-21</p>
+<p><strong>Last updated:</strong> 2018-08-22</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -346,7 +346,7 @@ div.section {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/843d7d158052d7015b88aeaacc7470102a6b5b6f" target="_blank">843d7d1</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/3a19b07d0452e0eb9a93fdc63b3ce4f239991190" target="_blank">3a19b07</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -360,16 +360,76 @@ Untracked files:
     Untracked:  data/liftover/
     Untracked:  data/map.stats.csv
     Untracked:  data/map.stats.xlsx
-    Untracked:  docs/figure/
 
 Unstaged changes:
-    Modified:   _workflowr.yml
+    Modified:   analysis/index.Rmd
     Deleted:    comparitive_threeprime.Rproj
 
 </code></pre>
 Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes. </details>
 </li>
 </ul>
+<details> <summary> <small><strong>Expand here to see past versions:</strong></small> </summary>
+<ul>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+File
+</th>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:left;">
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/3a19b07d0452e0eb9a93fdc63b3ce4f239991190/analysis/characterize.ortho.peaks.Rmd" target="_blank">3a19b07</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-22
+</td>
+<td style="text-align:left;">
+add hg19 dist
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/brimittleman/comparative_threeprime/d0d459958af52d7fd26c9c046382ccde12956f39/docs/characterize.ortho.peaks.html" target="_blank">d0d4599</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+</tbody>
+</table>
+</ul>
+<p></details></p>
 <hr />
 <p>I will use this analysis for QC on the orthologous peaks called in the liftover pipeline analysis.</p>
 <div id="distance-to-ortho-exon" class="section level2">
@@ -431,7 +491,58 @@ hu=ggplot(human_dist, aes(x=logdis)) + geom_density()+ labs(x=&quot;log10 abs.va
 
 plot_grid(ch, hu)</code></pre>
 <p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>This is a good sanity check. The distributions are similar.</p>
+<details> <summary><em>Expand here to see past versions of unnamed-chunk-4-1.png:</em></summary>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/d0d459958af52d7fd26c9c046382ccde12956f39/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-4-1.png" target="_blank">d0d4599</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-21
+</td>
+</tr>
+</tbody>
+</table>
+<p></details></p>
+<p>This is a good sanity check. The distributions are similar. I want to check this with the peaks from the human APAqtl study. I have the gencode exons and I will run bedtools cloests with this.</p>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=disUpstreamexon_hum
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=disUpstreamexon_hum.out
+#SBATCH --error=disUpstreamexon_hum.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/extra_anno/human_hg19_filteredPeaks.bed -b /project2/gilad/briana/comparitive_threeprime/data/extra_anno/gencode.hg19.v19.exons.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/dist_upexon/hg19.humanpeaks.distUpstreamexon.txt</code></pre>
+<p>update these files to remove the tab at the end.</p>
+<pre class="r"><code>hg19_dist=read.table(&quot;../data/dist_upexon/hg19.humanpeaks.distUpstreamexon.txt&quot;, col.names = c(&quot;peak_chr&quot;, &quot;peak_start&quot;, &quot;peak_end&quot;, &quot;peak_cov&quot;,&quot;peak_strand&quot;, &quot;peak_score&quot;, &quot;exon_chr&quot;, &quot;exon_start&quot;, &quot;exon_end&quot;, &quot;exon_name&quot;, &quot;exon_score&quot;, &quot;exon_strand&quot;, &quot;dist&quot;),stringsAsFactors = F, skip=1) %&gt;% mutate(logdis=log10(abs(dist) +1 ))
+
+ggplot(hg19_dist, aes(x=logdis)) + geom_density()+ labs(x=&quot;log10 abs.value \n distance +1 &quot;, title=&quot;Hg19 peaks dist to upstream exon&quot;)</code></pre>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>

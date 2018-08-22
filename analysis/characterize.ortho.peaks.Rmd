@@ -80,5 +80,34 @@ hu=ggplot(human_dist, aes(x=logdis)) + geom_density()+ labs(x="log10 abs.value \
 plot_grid(ch, hu)
 ```
 
-This is a good sanity check. The distributions are similar.  
+This is a good sanity check. The distributions are similar. I want to check this with the peaks from the human APAqtl study. I have the gencode exons and I will run bedtools cloests with this.  
+
+```{bash,eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=disUpstreamexon_hum
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=disUpstreamexon_hum.out
+#SBATCH --error=disUpstreamexon_hum.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/extra_anno/human_hg19_filteredPeaks.bed -b /project2/gilad/briana/comparitive_threeprime/data/extra_anno/gencode.hg19.v19.exons.bed > /project2/gilad/briana/comparitive_threeprime/data/dist_upexon/hg19.humanpeaks.distUpstreamexon.txt
+```
+
+
+update these files to remove the tab at the end. 
+
+
+```{r}
+hg19_dist=read.table("../data/dist_upexon/hg19.humanpeaks.distUpstreamexon.txt", col.names = c("peak_chr", "peak_start", "peak_end", "peak_cov","peak_strand", "peak_score", "exon_chr", "exon_start", "exon_end", "exon_name", "exon_score", "exon_strand", "dist"),stringsAsFactors = F, skip=1) %>% mutate(logdis=log10(abs(dist) +1 ))
+
+ggplot(hg19_dist, aes(x=logdis)) + geom_density()+ labs(x="log10 abs.value \n distance +1 ", title="Hg19 peaks dist to upstream exon")
+```
 

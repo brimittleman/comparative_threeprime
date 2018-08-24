@@ -322,7 +322,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-08-22</p>
+<p><strong>Last updated:</strong> 2018-08-24</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -346,16 +346,20 @@ div.section {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/3a19b07d0452e0eb9a93fdc63b3ce4f239991190" target="_blank">3a19b07</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/364f3303353ad3cf97203e1b8294d4fa2ed3bbed" target="_blank">364f330</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
     Ignored:    .RData
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
 
 Untracked files:
     Untracked:  com_threeprime.Rproj
+    Untracked:  data/PeakPerExon/
+    Untracked:  data/PeakPerGene/
+    Untracked:  data/dist_TES/
     Untracked:  data/dist_upexon/
     Untracked:  data/liftover/
     Untracked:  data/map.stats.csv
@@ -392,6 +396,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/364f3303353ad3cf97203e1b8294d4fa2ed3bbed/analysis/characterize.ortho.peaks.Rmd" target="_blank">364f330</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-24
+</td>
+<td style="text-align:left;">
+TES distance
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/brimittleman/comparative_threeprime/d11c2cf084c430ac589b3c8b920f9f880de87f8a/docs/characterize.ortho.peaks.html" target="_blank">d11c2cf</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-22
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 Rmd
@@ -477,6 +515,12 @@ Attaching package: &#39;cowplot&#39;</code></pre>
 <pre><code>The following object is masked from &#39;package:ggplot2&#39;:
 
     ggsave</code></pre>
+<pre class="r"><code>library(reshape2)</code></pre>
+<pre><code>
+Attaching package: &#39;reshape2&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:tidyr&#39;:
+
+    smiths</code></pre>
 <pre class="r"><code>getwd()</code></pre>
 <pre><code>[1] &quot;/Users/bmittleman1/Documents/Gilad_lab/comparitive_threeprime/com_threeprime/analysis&quot;</code></pre>
 <pre class="r"><code>file.exists(&quot;../data/dist_upexon/Chimp.distUpstreamexon.txt&quot;)</code></pre>
@@ -543,6 +587,220 @@ bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/
 
 ggplot(hg19_dist, aes(x=logdis)) + geom_density()+ labs(x=&quot;log10 abs.value \n distance +1 &quot;, title=&quot;Hg19 peaks dist to upstream exon&quot;)</code></pre>
 <p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details> <summary><em>Expand here to see past versions of unnamed-chunk-6-1.png:</em></summary>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/d11c2cf084c430ac589b3c8b920f9f880de87f8a/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-6-1.png" target="_blank">d11c2cf</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-22
+</td>
+</tr>
+</tbody>
+</table>
+<p></details></p>
+<div id="how-many-per-gene" class="section level3">
+<h3>How many per gene:</h3>
+<p>This is the code from the human apa qtl study. I used this to count how many peaks map to each gene. I will do this for the human and chimp here.</p>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=mapgene2peak2
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=mapgene2peak2.out
+#SBATCH --error=mapgene2peak2.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate three-prime-env
+
+
+bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_data/gencode.v19.annotation.proteincodinggene.bed -b /project2/gilad/briana/threeprimeseq/data/clean.peaks_comb/APApeaks_combined_clean_fixed.bed &gt; /project2/gilad/briana/threeprimeseq/data/clean.peaks_comb/APApeaks_combined_clean_countdistgenes.txt</code></pre>
+<p>I need to create bed files for the protein coding genes. For the human file the mRNAs are labeled with NM. The gene id is column 2, chr is column 3, strand is 4, start is 5, end is 6.</p>
+<p>First I keep only the NM ones with:</p>
+<pre class="bash"><code> grep &quot;NM&quot; humanGene_ncbiRefSeq.txt &gt; humanGene_ncbiRefSeq_mRNA.txt
+ 
+ awk &#39;{print $3 &quot;\t&quot; $5 &quot;\t&quot; $6 &quot;\t&quot; $2 &quot;\t&quot; &quot;.&quot; &quot;\t&quot; $4 }&#39; humanGene_ncbiRefSeq_mRNA.txt &gt; humanGene_ncbiRefSeq_mRNA.bed
+ 
+ grep &quot;NM&quot;  chimpGene_refGene.txt  &gt;  chimpGene_refGene_mRNA.txt 
+ 
+ awk &#39;{print $3 &quot;\t&quot; $5 &quot;\t&quot; $6 &quot;\t&quot; $2 &quot;\t&quot; &quot;.&quot; &quot;\t&quot; $4 }&#39;  chimpGene_refGene_mRNA.txt &gt;  chimpGene_refGene_mRNA.bed 
+</code></pre>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=PeakPerGene
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=PeakPerGene.out
+#SBATCH --error=PeakPerGene.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+
+bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/humanGene_ncbiRefSeq_mRNA_sort.bed -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/PeakPerGene/humanOrthoPeakPerGene.bed
+
+
+
+bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/chimpGene_refGene_mRNA_sort.bed -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/PeakPerGene/chimpOrthoPeakPerGene.bed</code></pre>
+<pre class="r"><code>human_peakpergene= read.table(&quot;../data/PeakPerGene/humanOrthoPeakPerGene.bed&quot;, header=F, stringsAsFactors = F,col.names = c(&quot;chr&quot;, &quot;start&quot;, &quot;end&quot;, &quot;gene&quot;, &quot;score&quot;, &quot;strand&quot;, &quot;numPeaks&quot;)) %&gt;% mutate(spec= &quot;H&quot;) %&gt;% filter(numPeaks &gt; 0)
+
+summary(human_peakpergene$numPeaks)</code></pre>
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.000   2.000   4.000   9.073  11.000 206.000 </code></pre>
+<pre class="r"><code>chimp_peakpergene= read.table(&quot;../data/PeakPerGene/chimpOrthoPeakPerGene.bed&quot;, stringsAsFactors = F, header = F, col.names = c(&quot;chr&quot;, &quot;start&quot;, &quot;end&quot;, &quot;gene&quot;, &quot;score&quot;, &quot;strand&quot;, &quot;numPeaks&quot;)) %&gt;% mutate(spec=&quot;C&quot;) %&gt;% filter(numPeaks &gt; 0)
+
+
+summary(chimp_peakpergene$numPeaks)</code></pre>
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.000   2.000   4.000   6.121   7.000  95.000 </code></pre>
+<pre class="r"><code>humanPPG=ggplot(human_peakpergene, aes(x=log10(numPeaks))) + geom_density(fill=&quot;Red&quot;) + labs(title=&quot;Peaks per Gene \n Human mRNA&quot;)
+chimpPPG=ggplot(chimp_peakpergene, aes(x=log10(numPeaks))) + geom_density(fill=&quot;Blue&quot;) + labs(title=&quot;Peaks per Gene \n Chimp mRNA&quot;)
+plot_grid(humanPPG, chimpPPG)</code></pre>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>I can run similar code on the conserved exons. We expect similar distribution but most of the exons will have 0. This is the primary reason to use conserved peaks in three prime bias data.</p>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=PeakPerExon
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=PeakPerExon.out
+#SBATCH --error=PeakPerExon.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+
+bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_data/ortho_exon/2017_July_ortho_human.small.sort.bed -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/PeakPerGene/humanOrthoPeakPerExon.bed
+
+
+
+bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_data/ortho_exon/2017_July_ortho_chimp.small.sort.bed -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/PeakPerGene/chimpOrthoPeakPerExon.bed</code></pre>
+<pre class="r"><code>file.exists(&quot;../data/PeakPerExon/humanOrthoPeakPerExon.bed&quot;)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<pre class="r"><code>human_peakperexon= read.table(&quot;../data/PeakPerExon/humanOrthoPeakPerExon.bed&quot;, header=F, stringsAsFactors = F,col.names = c(&quot;chr&quot;, &quot;start&quot;, &quot;end&quot;, &quot;exon&quot;, &quot;numPeaks&quot;)) %&gt;% mutate(spec= &quot;H&quot;) 
+
+summary(human_peakperexon$numPeaks)</code></pre>
+<pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+ 0.00000  0.00000  0.00000  0.06772  0.00000 13.00000 </code></pre>
+<pre class="r"><code>chimp_peakperexon= read.table(&quot;../data/PeakPerExon/chimpOrthoPeakPerExon.bed&quot;, stringsAsFactors = F, header = F, col.names = c(&quot;chr&quot;, &quot;start&quot;, &quot;end&quot;, &quot;exon&quot;, &quot;numPeaks&quot;)) %&gt;% mutate(spec=&quot;C&quot;) 
+
+
+summary(chimp_peakperexon$numPeaks)</code></pre>
+<pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+ 0.00000  0.00000  0.00000  0.06766  0.00000 13.00000 </code></pre>
+<pre class="r"><code>humanPPE=ggplot(human_peakperexon, aes(x=numPeaks)) + geom_density(fill=&quot;Red&quot;) + labs(title=&quot;Peaks per Exon \n Human&quot;)
+chimpPPE=ggplot(chimp_peakperexon, aes(x=numPeaks)) + geom_density(fill=&quot;Blue&quot;) + labs(title=&quot;Peaks per Exon \n Chimp &quot;)
+plot_grid(humanPPE, chimpPPE)</code></pre>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /> Most of the exons have 0 peaks. This is expected. I want to look at how many 0s, 1s ect we have in each data set.</p>
+<pre class="r"><code>human_exoncounts=human_peakperexon %&gt;% count(numPeaks)
+
+chimp_exoncounts=chimp_peakperexon %&gt;% count(numPeaks)
+
+
+both_exon=human_exoncounts %&gt;% left_join(chimp_exoncounts, by=&quot;numPeaks&quot;)
+
+colnames(both_exon)=c(&quot;PeakNum&quot;, &quot;Human&quot;, &quot;Chimp&quot;)
+
+
+both_exon_melt=melt(both_exon, measure.vars =c(&quot;Human&quot;, &quot;Chimp&quot;))
+
+
+ggplot(both_exon_melt, aes(x=PeakNum, y=value, col=variable)) + geom_point( size=3) + facet_grid(~variable) + labs(y=&quot;Exons&quot;, title=&quot;Number of peaks per conserved exons&quot;)</code></pre>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="distance-to-tes" class="section level3">
+<h3>Distance to TES</h3>
+<p>I want to look at the peaks distance to annotated gene TES in each species. I can make TES files by using the gene file. I need to take into account the strand. For the pos strand I use the end but for the neg strand I need to use the start. The easiest way to do this is in python. The scripts are called human_tes.py and chimp_tes.py</p>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=disTES
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=disTES.out
+#SBATCH --error=disTES.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+
+bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.bed -b /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/humanGene_ncbiRefSeq_TES_sort.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/dist_TES/Human.distTES.txt
+
+bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.bed  -b /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/chimpGene_refGene_TES_sort.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/dist_TES/Chimp.distTES.txt
+</code></pre>
+<pre class="r"><code>tes_names=c(&quot;peakchr&quot;, &quot;peakstart&quot;, &quot;peakend&quot;, &quot;peakname&quot;, &quot;genechr&quot;, &quot;geneTES_S&quot;, &quot;geneTES_E&quot;, &quot;gene&quot;, &quot;score&quot;, &quot;strand&quot;, &quot;dist&quot;)
+human_TESdis=read.table(&quot;../data/dist_TES/Human.distTES.txt&quot;, stringsAsFactors = F,col.names = tes_names ) %&gt;% mutate(logdis=log10(abs(dist)+1))
+
+chimp_TESdist= read.table(&quot;../data/dist_TES/Chimp.distTES.txt&quot;, stringsAsFactors = F, col.names = tes_names) %&gt;% mutate(logdis=log10(abs(dist) + 1))</code></pre>
+<pre class="r"><code>chTES=ggplot(chimp_TESdist, aes(x=logdis)) + geom_density(fill=&quot;blue&quot;) + labs(title=&quot;Distance to TES \n Chimp&quot;,x=&quot;Log10 distance + 1&quot;)
+
+huTES=ggplot(human_TESdis, aes(x=logdis)) + geom_density(fill=&quot;red&quot;) + labs(title=&quot;Distance to TES \n Human&quot;,x=&quot;Log10 distance + 1&quot;)
+
+
+plot_grid(huTES, chTES)</code></pre>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /> Flip this and do distance from teh TES to the peak.</p>
+<pre class="bash"><code>#!/bin/bash
+
+#SBATCH --job-name=disTES2Peak
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=disTES2Peak.out
+#SBATCH --error=disTES2Peak.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+
+bedtools closest -iu -D a -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.bed -a /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/humanGene_ncbiRefSeq_TES_sort.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/dist_TES/Human.distTES2Peak.txt
+
+bedtools closest -iu -D a -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.bed  -a /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/chimpGene_refGene_TES_sort.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/dist_TES/Chimp.distTES2Peak.txt
+</code></pre>
+<pre class="r"><code>tes2_names=c(&quot;genechr&quot;, &quot;geneTES_S&quot;, &quot;geneTES_E&quot;, &quot;gene&quot;, &quot;score&quot;, &quot;strand&quot;, &quot;peakchr&quot;, &quot;peakstart&quot;, &quot;peakend&quot;, &quot;peakname&quot;, &quot;dist&quot;)
+human_TES2dis=read.table(&quot;../data/dist_TES/Human.distTES2Peak.txt&quot;, stringsAsFactors = F,col.names = tes2_names ) %&gt;% mutate(logdis=log10(abs(dist)+1))
+
+chimp_TES2dist= read.table(&quot;../data/dist_TES/Chimp.distTES2Peak.txt&quot;, stringsAsFactors = F, col.names = tes2_names) %&gt;% mutate(logdis=log10(abs(dist) + 1))</code></pre>
+<pre class="r"><code>chTES2=ggplot(chimp_TES2dist, aes(x=logdis)) + geom_density(fill=&quot;blue&quot;) + labs(title=&quot;Distance TES to Peak \n Chimp&quot;,x=&quot;Log10 distance + 1&quot;)
+
+huTES2=ggplot(human_TES2dis, aes(x=logdis)) + geom_density(fill=&quot;red&quot;) + labs(title=&quot;Distance TES to Peak \n Human&quot;,x=&quot;Log10 distance + 1&quot;)
+
+
+plot_grid(huTES2, chTES2)</code></pre>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
@@ -562,9 +820,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] bindrcpp_0.2.2  cowplot_0.9.3   workflowr_1.1.1 forcats_0.3.0  
- [5] stringr_1.3.1   dplyr_0.7.6     purrr_0.2.5     readr_1.1.1    
- [9] tidyr_0.8.1     tibble_1.4.2    ggplot2_3.0.0   tidyverse_1.2.1
+ [1] bindrcpp_0.2.2  reshape2_1.4.3  cowplot_0.9.3   workflowr_1.1.1
+ [5] forcats_0.3.0   stringr_1.3.1   dplyr_0.7.6     purrr_0.2.5    
+ [9] readr_1.1.1     tidyr_0.8.1     tibble_1.4.2    ggplot2_3.0.0  
+[13] tidyverse_1.2.1
 
 loaded via a namespace (and not attached):
  [1] tidyselect_0.2.4  haven_1.1.2       lattice_0.20-35  

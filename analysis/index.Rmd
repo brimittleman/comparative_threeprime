@@ -12,3 +12,6 @@ Create orthologous peak file:
 
 * [Lift Over](liftover_pipeline.html)  
 
+* [Characterize ortho peaks](characterize.ortho.peaks.html)
+
+* [Reads per Ortho Peak QC](reads.per.peak.html)

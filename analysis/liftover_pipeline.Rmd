@@ -187,6 +187,9 @@ chimp_final=chimp_lifted %>% left_join(chimp_rev, by="name")
 ###Intersection of reciprocal liftover  
 ```{r}
 union_peaks=human_final %>% inner_join(chimp_final, by=c("human_chr", "human_start", "human_end", "chimp_chr", "chimp_start", "chimp_end" ))
+
+peak_names=union_peaks %>% select(name.x, name.y) 
+colnames(peak_names)= c("human", "chimp")
 ```
 This leaves `r nrow(union_peaks)` 
 
@@ -203,6 +206,7 @@ Write these:
 ```{r, eval=F}
 write.table(human_ortho, file="../data/liftover/humanOrthoPeaks.bed", quote = F, row.names = F, col.names = F,sep="\t")
 write.table(chimp_ortho, file="../data/liftover/chimpOrthoPeaks.bed", quote= F, row.names = F, col.names = F, sep="\t")
+write.table(peak_names, file="../data/liftover/HumanChimpPeaknames.txt", quote=F, row.names = F, col.names = T, sep="\t")
 ```
 
 

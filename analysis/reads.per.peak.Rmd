@@ -224,3 +224,12 @@ boxplot(allPeakQuant_matrix_cpm, main="Log CPM Counts")
 
 
 
+I should think about other normalization types. I am going to look at other papers to see what they do. For example, Derti et al. 2012.  
+
+"All samples were normalized to equal numbers of aligned sequencing reads by random selection"  
+
+Things to think about:
+
+* peak size diff in human/chimp  
+
+* divide by lib size or mapped reads or reads mapping to peaks  

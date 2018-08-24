@@ -9,6 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+
+##Feature count  
 In this analysis I will run feature counts on the human and chimp,total and nuclear threeprime seq libraries agaisnt the orthologous peaks I called with liftover. 
 
 First I will need to convert the bed files to saf files. This File is GeneID, Chr, Start, End, Strand. In my case it is peak ID.  
@@ -83,6 +85,8 @@ featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/
 featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/ChimpNuclear_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/chimp/data/sort/*N-sort.bam -s 0
 
 ```
+
+##Visualize raw counts  
 
 I need the matching peaks from human and chimps from the liftover pipeline data.  
 
@@ -194,4 +198,8 @@ prenormPCA78=ggplot(rotation, aes(x=PC7, y=PC8, col=Species, shape=Fraction)) + 
 ```{r}
 plot_grid(prenormPCA,prenormPCA34, prenormPCA56, prenormPCA78)
 ```
+##Normalize counts  
+
+To normalize this i will need to understand the distributions. I am not sure if this data will be normal.  
+
 

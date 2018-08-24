@@ -346,7 +346,7 @@ div.section {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/679aef46aa87f14c03d50bf8163ea9bd264897d0" target="_blank">679aef4</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/43f6773cd88ac143167cf08098ff28cca3420583" target="_blank">43f6773</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -363,6 +363,7 @@ Untracked files:
     Untracked:  data/liftover/
     Untracked:  data/map.stats.csv
     Untracked:  data/map.stats.xlsx
+    Untracked:  data/orthoPeak_quant/
 
 Unstaged changes:
     Deleted:    comparitive_threeprime.Rproj
@@ -399,6 +400,40 @@ Message
 Rmd
 </td>
 <td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/43f6773cd88ac143167cf08098ff28cca3420583/analysis/reads.per.peak.Rmd" target="_blank">43f6773</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-24
+</td>
+<td style="text-align:left;">
+prenormalization PCA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/brimittleman/comparative_threeprime/5b4893e707c46249d98e53a647e9cd666797cae7/docs/reads.per.peak.html" target="_blank">5b4893e</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-24
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
 <a href="https://github.com/brimittleman/comparative_threeprime/blob/679aef46aa87f14c03d50bf8163ea9bd264897d0/analysis/reads.per.peak.Rmd" target="_blank">679aef4</a>
 </td>
 <td style="text-align:left;">
@@ -428,8 +463,7 @@ for ln in open(&quot;/project2/gilad/briana/comparitive_threeprime/data/ortho_pe
     chrom, start, end, name = ln.split()
     start=int(start)
     end=int(end)
-    ID = &quot;%s_%s_%s_%s&quot;%(name, chrom ,start, end)
-    fout.write(&quot;%s\t%s\t%d\t%d\t.\n&quot;%(ID, chrom, start, end))
+    fout.write(&quot;%s\t%s\t%d\t%d\t.\n&quot;%(name, chrom, start, end))
 
 fout.close()
 
@@ -443,8 +477,7 @@ for ln in open(&quot;/project2/gilad/briana/comparitive_threeprime/data/ortho_pe
     chrom, start, end, name = ln.split()
     start=int(start)
     end=int(end)
-    ID = &quot;%s_%s_%s_%s&quot;%(name, chrom ,start, end)
-    fout.write(&quot;%s\t%s\t%d\t%d\t.\n&quot;%(ID, chrom, start, end))
+    fout.write(&quot;%s\t%s\t%d\t%d\t.\n&quot;%(name, chrom, start, end))
 
 fout.close()
 </code></pre>
@@ -470,17 +503,107 @@ source activate comp_threeprime_env
 
 # outdir: /project2/gilad/briana/comparitive_threeprime/data/Peak_quant
 
-featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.saf -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/HumanTotal_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/human/data/sort/*T-sort.bam -s 1
+#-s 0 is unstranded 
 
-featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.saf -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/HumanNuclear_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/human/data/sort/*N-sort.bam -s 1
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/HumanTotal_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/human/data/sort/*T-sort.bam -s 0
+
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/HumanNuclear_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/human/data/sort/*N-sort.bam -s 0
 
 
-featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.saf -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/ChimpTotal_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/chimp/data/sort/*T-sort.bam -s 1
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/ChimpTotal_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/chimp/data/sort/*T-sort.bam -s 0
 
-featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.saf -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/ChimpNuclear_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/chimp/data/sort/*N-sort.bam -s 1
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/ChimpNuclear_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/chimp/data/sort/*N-sort.bam -s 0
 </code></pre>
 <p>I need the matching peaks from human and chimps from the liftover pipeline data.</p>
-<pre class="r"><code>PeakNames=read.table(file = &quot;../data/liftover/HumanChimpPeaknames.txt&quot;, header=T)</code></pre>
+<pre class="r"><code>library(workflowr)</code></pre>
+<pre><code>This is workflowr version 1.1.1
+Run ?workflowr for help getting started</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>── Attaching packages ─────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>✔ ggplot2 3.0.0     ✔ purrr   0.2.5
+✔ tibble  1.4.2     ✔ dplyr   0.7.6
+✔ tidyr   0.8.1     ✔ stringr 1.3.1
+✔ readr   1.1.1     ✔ forcats 0.3.0</code></pre>
+<pre><code>── Conflicts ────────────────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(reshape2)</code></pre>
+<pre><code>
+Attaching package: &#39;reshape2&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:tidyr&#39;:
+
+    smiths</code></pre>
+<pre class="r"><code>library(cowplot)</code></pre>
+<pre><code>
+Attaching package: &#39;cowplot&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:ggplot2&#39;:
+
+    ggsave</code></pre>
+<pre class="r"><code>PeakNames=read.table(file = &quot;../data/liftover/HumanChimpPeaknames.txt&quot;, header=T, stringsAsFactors = F)</code></pre>
+<p>Chimps:</p>
+<ul>
+<li>18358<br />
+</li>
+<li>3622<br />
+</li>
+<li>3659<br />
+</li>
+<li>4973<br />
+</li>
+<li>pt30<br />
+</li>
+<li>pt91</li>
+</ul>
+<p>Humans:</p>
+<ul>
+<li>18498<br />
+</li>
+<li>18499</li>
+<li>18502<br />
+</li>
+<li>18504<br />
+</li>
+<li>18510</li>
+<li>18523</li>
+</ul>
+<pre class="r"><code>namesHN= c(&quot;human&quot;,&quot;Chr&quot;, &quot;Start&quot;, &quot;End&quot;, &quot;Strand&quot;, &quot;Length&quot;, &quot;N18498&quot;, &quot;N18499&quot;, &quot;N18502&quot;, &quot;N18504&quot;, &quot;N18510&quot;, &quot;N18523&quot;)
+humanNuc=read.table(&quot;../data/orthoPeak_quant/HumanNuclear_Orthopeak.quant&quot;, header = T, stringsAsFactors = F, col.names = namesHN)
+
+namesHT= c(&quot;human&quot;,&quot;Chr&quot;, &quot;Start&quot;, &quot;End&quot;, &quot;Strand&quot;, &quot;Length&quot;, &quot;T18498&quot;, &quot;T18499&quot;, &quot;T18502&quot;, &quot;T18504&quot;, &quot;T18510&quot;, &quot;T18523&quot;)
+humanTot=read.table(&quot;../data/orthoPeak_quant/HumanTotal_Orthopeak.quant&quot;, header=T, stringsAsFactors = F, col.names = namesHT)
+
+
+namesCN= c(&quot;chimp&quot;,&quot;Chr&quot;, &quot;Start&quot;, &quot;End&quot;, &quot;Strand&quot;, &quot;Length&quot;, &quot;N18358&quot;, &quot;N3622&quot;, &quot;N3659&quot;, &quot;N4973&quot;, &quot;Npt30&quot;, &quot;Npt91&quot;)
+
+chimpNuc=read.table(&quot;../data/orthoPeak_quant/ChimpNuclear_Orthopeak.quant&quot;, header = T,stringsAsFactors = F, col.names = namesCN)
+
+namesCT= c(&quot;chimp&quot;,&quot;Chr&quot;, &quot;Start&quot;, &quot;End&quot;, &quot;Strand&quot;, &quot;Length&quot;, &quot;T18358&quot;, &quot;T3622&quot;, &quot;T3659&quot;, &quot;T4973&quot;, &quot;Tpt30&quot;, &quot;Tpt91&quot;)
+chimpTot=read.table(&quot;../data/orthoPeak_quant/ChimpTotal_Orthopeak.quant&quot;, header=T, stringsAsFactors = F, col.names = namesCT)</code></pre>
+<p>I need to add the human names to the chimp file and chimp names to the human files.</p>
+<pre class="r"><code>humanNuc_ed= humanNuc %&gt;% inner_join(PeakNames, by=&quot;human&quot;) %&gt;% mutate(ID=paste(human,chimp, sep=&quot;:&quot;)) %&gt;% select(&quot;ID&quot;,  &quot;N18498&quot;, &quot;N18499&quot;, &quot;N18502&quot;, &quot;N18504&quot;, &quot;N18510&quot;, &quot;N18523&quot;)
+
+humanTot_ed= humanTot %&gt;% inner_join(PeakNames, by=&quot;human&quot;) %&gt;%mutate(ID=paste(human,chimp, sep=&quot;:&quot;)) %&gt;% select(&quot;ID&quot;,  &quot;T18498&quot;, &quot;T18499&quot;, &quot;T18502&quot;, &quot;T18504&quot;, &quot;T18510&quot;, &quot;T18523&quot;)
+
+chimpNuc_ed=chimpNuc %&gt;% inner_join(PeakNames, by=&quot;chimp&quot;) %&gt;% mutate(ID=paste(human,chimp, sep=&quot;:&quot;)) %&gt;% select(&quot;ID&quot;, &quot;N18358&quot;, &quot;N3622&quot;, &quot;N3659&quot;, &quot;N4973&quot;, &quot;Npt30&quot;, &quot;Npt91&quot;)
+
+chimpTot_ed= chimpTot %&gt;% inner_join(PeakNames, by=&quot;chimp&quot;) %&gt;% mutate(ID=paste(human,chimp, sep=&quot;:&quot;)) %&gt;% select(&quot;ID&quot;, &quot;T18358&quot;, &quot;T3622&quot;, &quot;T3659&quot;, &quot;T4973&quot;, &quot;Tpt30&quot;, &quot;Tpt91&quot;)</code></pre>
+<p>Now I need to join all of these together by the peaks.</p>
+<pre class="r"><code>allPeakQuant= humanNuc_ed %&gt;% left_join(humanTot_ed, by=&quot;ID&quot;) %&gt;% left_join(chimpNuc_ed, by=&quot;ID&quot;) %&gt;% left_join(chimpTot_ed, by=&quot;ID&quot;) %&gt;% column_to_rownames(var=&quot;ID&quot;)
+allPeakQuant_matrix=as.matrix(allPeakQuant) </code></pre>
+<p>Run PCA:</p>
+<pre class="r"><code>humans=c(&quot;N18498&quot;, &quot;N18499&quot;, &quot;N18502&quot;, &quot;N18504&quot;, &quot;N18510&quot;, &quot;N18523&quot;, &quot;T18498&quot;, &quot;T18499&quot;, &quot;T18502&quot;, &quot;T18504&quot;, &quot;T18510&quot;, &quot;T18523&quot;)
+pc=prcomp(allPeakQuant_matrix)
+rotation=data.frame(pc$rotation) %&gt;% rownames_to_column(var=&quot;Sample&quot;) %&gt;% mutate(Fraction=ifelse(grepl(&quot;N&quot;, Sample), &quot;Nuclear&quot;, &quot;Total&quot;)) %&gt;% mutate(Species= ifelse(Sample %in% humans, &quot;Human&quot;, &quot;Chimp&quot;))</code></pre>
+<p>Plot this:</p>
+<pre class="r"><code>prenormPCA=ggplot(rotation, aes(x=PC1, y=PC2, col=Species, shape=Fraction)) + geom_point() + labs(title=&quot;Prenormalization PCA&quot;)
+
+prenormPCA34=ggplot(rotation, aes(x=PC3, y=PC4, col=Species, shape=Fraction)) + geom_point() + labs(title=&quot;Prenormalization PCA&quot;)
+
+prenormPCA56=ggplot(rotation, aes(x=PC5, y=PC6, col=Species, shape=Fraction)) + geom_point() + labs(title=&quot;Prenormalization PCA&quot;)
+
+prenormPCA78=ggplot(rotation, aes(x=PC7, y=PC8, col=Species, shape=Fraction)) + geom_point() + labs(title=&quot;Prenormalization PCA&quot;)</code></pre>
+<pre class="r"><code>plot_grid(prenormPCA,prenormPCA34, prenormPCA56, prenormPCA78)</code></pre>
+<p><img src="figure/reads.per.peak.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
@@ -498,14 +621,30 @@ locale:
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
+other attached packages:
+ [1] bindrcpp_0.2.2  cowplot_0.9.3   reshape2_1.4.3  forcats_0.3.0  
+ [5] stringr_1.3.1   dplyr_0.7.6     purrr_0.2.5     readr_1.1.1    
+ [9] tidyr_0.8.1     tibble_1.4.2    ggplot2_3.0.0   tidyverse_1.2.1
+[13] workflowr_1.1.1
+
 loaded via a namespace (and not attached):
- [1] workflowr_1.1.1   Rcpp_0.12.18      digest_0.6.15    
- [4] rprojroot_1.3-2   R.methodsS3_1.7.1 backports_1.1.2  
- [7] git2r_0.23.0      magrittr_1.5      evaluate_0.11    
-[10] stringi_1.2.4     whisker_0.3-2     R.oo_1.22.0      
-[13] R.utils_2.6.0     rmarkdown_1.10    tools_3.5.1      
-[16] stringr_1.3.1     yaml_2.1.19       compiler_3.5.1   
-[19] htmltools_0.3.6   knitr_1.20       </code></pre>
+ [1] tidyselect_0.2.4  haven_1.1.2       lattice_0.20-35  
+ [4] colorspace_1.3-2  htmltools_0.3.6   yaml_2.1.19      
+ [7] rlang_0.2.1       R.oo_1.22.0       pillar_1.3.0     
+[10] glue_1.3.0        withr_2.1.2       R.utils_2.6.0    
+[13] modelr_0.1.2      readxl_1.1.0      bindr_0.1.1      
+[16] plyr_1.8.4        munsell_0.5.0     gtable_0.2.0     
+[19] cellranger_1.1.0  rvest_0.3.2       R.methodsS3_1.7.1
+[22] evaluate_0.11     labeling_0.3      knitr_1.20       
+[25] broom_0.5.0       Rcpp_0.12.18      scales_0.5.0     
+[28] backports_1.1.2   jsonlite_1.5      hms_0.4.2        
+[31] digest_0.6.15     stringi_1.2.4     grid_3.5.1       
+[34] rprojroot_1.3-2   cli_1.0.0         tools_3.5.1      
+[37] magrittr_1.5      lazyeval_0.2.1    crayon_1.3.4     
+[40] whisker_0.3-2     pkgconfig_2.0.1   xml2_1.2.0       
+[43] lubridate_1.7.4   assertthat_0.2.0  rmarkdown_1.10   
+[46] httr_1.3.1        rstudioapi_0.7    R6_2.2.2         
+[49] nlme_3.1-137      git2r_0.23.0      compiler_3.5.1   </code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using

@@ -202,4 +202,25 @@ plot_grid(prenormPCA,prenormPCA34, prenormPCA56, prenormPCA78)
 
 To normalize this i will need to understand the distributions. I am not sure if this data will be normal.  
 
+```{r}
+library(edgeR)
+```
+
+```{r}
+allPeakQuant_matrix_cpm=cpm(allPeakQuant_matrix, log=T)
+
+plotDensities(allPeakQuant_matrix_cpm, legend = "bottomright", main="Pre-filtering")
+abline(v = 0, lty = 3)
+```
+ 
+```{r}
+
+par(mfrow=c(2,1))
+boxplot(log10(allPeakQuant + 1), main="Log Raw Counts + 1")
+boxplot(allPeakQuant_matrix_cpm, main="Log CPM Counts")
+
+
+```
+
+
 

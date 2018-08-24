@@ -322,7 +322,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-08-21</p>
+<p><strong>Last updated:</strong> 2018-08-24</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -346,7 +346,7 @@ div.section {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/843d7d158052d7015b88aeaacc7470102a6b5b6f" target="_blank">843d7d1</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/c39776db4ca233592ed83aa178901d346ab4ebdf" target="_blank">c39776d</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -355,15 +355,18 @@ Ignored files:
     Ignored:    .Rproj.user/
 
 Untracked files:
+    Untracked:  analysis/reads.per.peak.Rmd
     Untracked:  com_threeprime.Rproj
+    Untracked:  data/PeakPerExon/
+    Untracked:  data/PeakPerGene/
+    Untracked:  data/dist_TES/
     Untracked:  data/dist_upexon/
     Untracked:  data/liftover/
     Untracked:  data/map.stats.csv
     Untracked:  data/map.stats.xlsx
-    Untracked:  docs/figure/
 
 Unstaged changes:
-    Modified:   _workflowr.yml
+    Modified:   analysis/index.Rmd
     Deleted:    comparitive_threeprime.Rproj
 
 </code></pre>
@@ -393,6 +396,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/c39776db4ca233592ed83aa178901d346ab4ebdf/analysis/liftover_pipeline.Rmd" target="_blank">c39776d</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-24
+</td>
+<td style="text-align:left;">
+add corresponding peak names
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/brimittleman/comparative_threeprime/d0d459958af52d7fd26c9c046382ccde12956f39/docs/liftover_pipeline.html" target="_blank">d0d4599</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-21
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 Rmd
@@ -581,14 +618,18 @@ chimp_lifted=read.table(&quot;../data/liftover/filtered_chimpPeaks.lifted.revers
 </div>
 <div id="intersection-of-reciprocal-liftover" class="section level3">
 <h3>Intersection of reciprocal liftover</h3>
-<pre class="r"><code>union_peaks=human_final %&gt;% inner_join(chimp_final, by=c(&quot;human_chr&quot;, &quot;human_start&quot;, &quot;human_end&quot;, &quot;chimp_chr&quot;, &quot;chimp_start&quot;, &quot;chimp_end&quot; ))</code></pre>
+<pre class="r"><code>union_peaks=human_final %&gt;% inner_join(chimp_final, by=c(&quot;human_chr&quot;, &quot;human_start&quot;, &quot;human_end&quot;, &quot;chimp_chr&quot;, &quot;chimp_start&quot;, &quot;chimp_end&quot; ))
+
+peak_names=union_peaks %&gt;% select(name.x, name.y) 
+colnames(peak_names)= c(&quot;human&quot;, &quot;chimp&quot;)</code></pre>
 <p>This leaves 76207</p>
 <p>I can then seperate these and write out the bedfile. With that I can look at metrics such as how many per gene or distance to last exon.</p>
 <pre class="r"><code>human_ortho= union_peaks %&gt;% select(human_chr, human_start, human_end, name.x) 
 chimp_ortho= union_peaks %&gt;% select(chimp_chr, chimp_start, chimp_end, name.y)</code></pre>
 <p>Write these:</p>
 <pre class="r"><code>write.table(human_ortho, file=&quot;../data/liftover/humanOrthoPeaks.bed&quot;, quote = F, row.names = F, col.names = F,sep=&quot;\t&quot;)
-write.table(chimp_ortho, file=&quot;../data/liftover/chimpOrthoPeaks.bed&quot;, quote= F, row.names = F, col.names = F, sep=&quot;\t&quot;)</code></pre>
+write.table(chimp_ortho, file=&quot;../data/liftover/chimpOrthoPeaks.bed&quot;, quote= F, row.names = F, col.names = F, sep=&quot;\t&quot;)
+write.table(peak_names, file=&quot;../data/liftover/HumanChimpPeaknames.txt&quot;, quote=F, row.names = F, col.names = T, sep=&quot;\t&quot;)</code></pre>
 </div>
 </div>
 <div id="session-information" class="section level2">

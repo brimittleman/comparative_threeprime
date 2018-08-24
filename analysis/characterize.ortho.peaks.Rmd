@@ -50,6 +50,7 @@ Import the files and plot the distances.
 library(tidyverse)
 library(workflowr)
 library(cowplot)
+library(reshape2)
 ```
 
 
@@ -109,5 +110,239 @@ update these files to remove the tab at the end.
 hg19_dist=read.table("../data/dist_upexon/hg19.humanpeaks.distUpstreamexon.txt", col.names = c("peak_chr", "peak_start", "peak_end", "peak_cov","peak_strand", "peak_score", "exon_chr", "exon_start", "exon_end", "exon_name", "exon_score", "exon_strand", "dist"),stringsAsFactors = F, skip=1) %>% mutate(logdis=log10(abs(dist) +1 ))
 
 ggplot(hg19_dist, aes(x=logdis)) + geom_density()+ labs(x="log10 abs.value \n distance +1 ", title="Hg19 peaks dist to upstream exon")
+```
+
+###How many per gene:  
+
+
+This is the code from the human apa qtl study. I used this to count how many peaks map to each gene. I will do this for the human and chimp here.  
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=mapgene2peak2
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=mapgene2peak2.out
+#SBATCH --error=mapgene2peak2.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate three-prime-env
+
+
+bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_data/gencode.v19.annotation.proteincodinggene.bed -b /project2/gilad/briana/threeprimeseq/data/clean.peaks_comb/APApeaks_combined_clean_fixed.bed > /project2/gilad/briana/threeprimeseq/data/clean.peaks_comb/APApeaks_combined_clean_countdistgenes.txt
+```
+
+I need to create bed files for the protein coding genes.  For the human file the mRNAs are labeled with NM. The gene id is column 2, chr is column 3, strand is 4, start is 5, end is 6.  
+
+First I keep only the NM ones with:  
+
+```{bash, eval=F}
+ grep "NM" humanGene_ncbiRefSeq.txt > humanGene_ncbiRefSeq_mRNA.txt
+ 
+ awk '{print $3 "\t" $5 "\t" $6 "\t" $2 "\t" "." "\t" $4 }' humanGene_ncbiRefSeq_mRNA.txt > humanGene_ncbiRefSeq_mRNA.bed
+ 
+ grep "NM"  chimpGene_refGene.txt  >  chimpGene_refGene_mRNA.txt 
+ 
+ awk '{print $3 "\t" $5 "\t" $6 "\t" $2 "\t" "." "\t" $4 }'  chimpGene_refGene_mRNA.txt >  chimpGene_refGene_mRNA.bed 
+
+```
+
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=PeakPerGene
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=PeakPerGene.out
+#SBATCH --error=PeakPerGene.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+
+bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/humanGene_ncbiRefSeq_mRNA_sort.bed -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.bed > /project2/gilad/briana/comparitive_threeprime/data/PeakPerGene/humanOrthoPeakPerGene.bed
+
+
+
+bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/chimpGene_refGene_mRNA_sort.bed -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.bed > /project2/gilad/briana/comparitive_threeprime/data/PeakPerGene/chimpOrthoPeakPerGene.bed
+```
+
+
+```{r}
+human_peakpergene= read.table("../data/PeakPerGene/humanOrthoPeakPerGene.bed", header=F, stringsAsFactors = F,col.names = c("chr", "start", "end", "gene", "score", "strand", "numPeaks")) %>% mutate(spec= "H") %>% filter(numPeaks > 0)
+
+summary(human_peakpergene$numPeaks)
+chimp_peakpergene= read.table("../data/PeakPerGene/chimpOrthoPeakPerGene.bed", stringsAsFactors = F, header = F, col.names = c("chr", "start", "end", "gene", "score", "strand", "numPeaks")) %>% mutate(spec="C") %>% filter(numPeaks > 0)
+
+
+summary(chimp_peakpergene$numPeaks)
+```
+
+```{r}
+humanPPG=ggplot(human_peakpergene, aes(x=log10(numPeaks))) + geom_density(fill="Red") + labs(title="Peaks per Gene \n Human mRNA")
+chimpPPG=ggplot(chimp_peakpergene, aes(x=log10(numPeaks))) + geom_density(fill="Blue") + labs(title="Peaks per Gene \n Chimp mRNA")
+plot_grid(humanPPG, chimpPPG)
+```
+
+
+I can run similar code on the conserved exons. We expect similar distribution but most of the exons will have 0. This is the primary reason to use conserved peaks in three prime bias data.  
+
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=PeakPerExon
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=PeakPerExon.out
+#SBATCH --error=PeakPerExon.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+
+bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_data/ortho_exon/2017_July_ortho_human.small.sort.bed -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.bed > /project2/gilad/briana/comparitive_threeprime/data/PeakPerGene/humanOrthoPeakPerExon.bed
+
+
+
+bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_data/ortho_exon/2017_July_ortho_chimp.small.sort.bed -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.bed > /project2/gilad/briana/comparitive_threeprime/data/PeakPerGene/chimpOrthoPeakPerExon.bed
+```
+
+
+```{r}
+file.exists("../data/PeakPerExon/humanOrthoPeakPerExon.bed")
+human_peakperexon= read.table("../data/PeakPerExon/humanOrthoPeakPerExon.bed", header=F, stringsAsFactors = F,col.names = c("chr", "start", "end", "exon", "numPeaks")) %>% mutate(spec= "H") 
+
+summary(human_peakperexon$numPeaks)
+
+
+chimp_peakperexon= read.table("../data/PeakPerExon/chimpOrthoPeakPerExon.bed", stringsAsFactors = F, header = F, col.names = c("chr", "start", "end", "exon", "numPeaks")) %>% mutate(spec="C") 
+
+
+summary(chimp_peakperexon$numPeaks)
+```
+
+
+```{r}
+humanPPE=ggplot(human_peakperexon, aes(x=numPeaks)) + geom_density(fill="Red") + labs(title="Peaks per Exon \n Human")
+chimpPPE=ggplot(chimp_peakperexon, aes(x=numPeaks)) + geom_density(fill="Blue") + labs(title="Peaks per Exon \n Chimp ")
+plot_grid(humanPPE, chimpPPE)
+```
+Most of the exons have 0 peaks. This is expected. I want to look at how many 0s, 1s ect we have in each data set.
+
+```{r}
+human_exoncounts=human_peakperexon %>% count(numPeaks)
+
+chimp_exoncounts=chimp_peakperexon %>% count(numPeaks)
+
+
+both_exon=human_exoncounts %>% left_join(chimp_exoncounts, by="numPeaks")
+
+colnames(both_exon)=c("PeakNum", "Human", "Chimp")
+
+
+both_exon_melt=melt(both_exon, measure.vars =c("Human", "Chimp"))
+
+
+ggplot(both_exon_melt, aes(x=PeakNum, y=value, col=variable)) + geom_point( size=3) + facet_grid(~variable) + labs(y="Exons", title="Number of peaks per conserved exons")
+```
+
+###Distance to TES  
+
+I want to look at the peaks distance to annotated gene TES in each species. I can make TES files by using the gene file. I need to take into account the strand. For the pos strand I use the end but for the neg strand I need to use the start.  The easiest way to do this is in python. The scripts are called human_tes.py and chimp_tes.py  
+
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=disTES
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=disTES.out
+#SBATCH --error=disTES.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+
+bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.bed -b /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/humanGene_ncbiRefSeq_TES_sort.bed > /project2/gilad/briana/comparitive_threeprime/data/dist_TES/Human.distTES.txt
+
+bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.bed  -b /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/chimpGene_refGene_TES_sort.bed > /project2/gilad/briana/comparitive_threeprime/data/dist_TES/Chimp.distTES.txt
+
+
+```
+
+```{r}
+
+tes_names=c("peakchr", "peakstart", "peakend", "peakname", "genechr", "geneTES_S", "geneTES_E", "gene", "score", "strand", "dist")
+human_TESdis=read.table("../data/dist_TES/Human.distTES.txt", stringsAsFactors = F,col.names = tes_names ) %>% mutate(logdis=log10(abs(dist)+1))
+
+chimp_TESdist= read.table("../data/dist_TES/Chimp.distTES.txt", stringsAsFactors = F, col.names = tes_names) %>% mutate(logdis=log10(abs(dist) + 1))
+```
+
+
+```{r}
+
+
+chTES=ggplot(chimp_TESdist, aes(x=logdis)) + geom_density(fill="blue") + labs(title="Distance to TES \n Chimp",x="Log10 distance + 1")
+
+huTES=ggplot(human_TESdis, aes(x=logdis)) + geom_density(fill="red") + labs(title="Distance to TES \n Human",x="Log10 distance + 1")
+
+
+plot_grid(huTES, chTES)
+```
+Flip this and do distance from teh TES to the peak.  
+
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=disTES2Peak
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=disTES2Peak.out
+#SBATCH --error=disTES2Peak.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+
+bedtools closest -iu -D a -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.bed -a /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/humanGene_ncbiRefSeq_TES_sort.bed > /project2/gilad/briana/comparitive_threeprime/data/dist_TES/Human.distTES2Peak.txt
+
+bedtools closest -iu -D a -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.bed  -a /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/chimpGene_refGene_TES_sort.bed > /project2/gilad/briana/comparitive_threeprime/data/dist_TES/Chimp.distTES2Peak.txt
+
+```
+
+
+```{r}
+tes2_names=c("genechr", "geneTES_S", "geneTES_E", "gene", "score", "strand", "peakchr", "peakstart", "peakend", "peakname", "dist")
+human_TES2dis=read.table("../data/dist_TES/Human.distTES2Peak.txt", stringsAsFactors = F,col.names = tes2_names ) %>% mutate(logdis=log10(abs(dist)+1))
+
+chimp_TES2dist= read.table("../data/dist_TES/Chimp.distTES2Peak.txt", stringsAsFactors = F, col.names = tes2_names) %>% mutate(logdis=log10(abs(dist) + 1))
+```
+
+
+```{r}
+
+chTES2=ggplot(chimp_TES2dist, aes(x=logdis)) + geom_density(fill="blue") + labs(title="Distance TES to Peak \n Chimp",x="Log10 distance + 1")
+
+huTES2=ggplot(human_TES2dis, aes(x=logdis)) + geom_density(fill="red") + labs(title="Distance TES to Peak \n Human",x="Log10 distance + 1")
+
+
+plot_grid(huTES2, chTES2)
 ```
 

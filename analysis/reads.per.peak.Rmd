@@ -24,8 +24,7 @@ for ln in open("/project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/h
     chrom, start, end, name = ln.split()
     start=int(start)
     end=int(end)
-    ID = "%s_%s_%s_%s"%(name, chrom ,start, end)
-    fout.write("%s\t%s\t%d\t%d\t.\n"%(ID, chrom, start, end))
+    fout.write("%s\t%s\t%d\t%d\t.\n"%(name, chrom, start, end))
 
 fout.close()
 
@@ -39,8 +38,7 @@ for ln in open("/project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/c
     chrom, start, end, name = ln.split()
     start=int(start)
     end=int(end)
-    ID = "%s_%s_%s_%s"%(name, chrom ,start, end)
-    fout.write("%s\t%s\t%d\t%d\t.\n"%(ID, chrom, start, end))
+    fout.write("%s\t%s\t%d\t%d\t.\n"%(name, chrom, start, end))
 
 fout.close()
 
@@ -73,20 +71,127 @@ source activate comp_threeprime_env
 
 # outdir: /project2/gilad/briana/comparitive_threeprime/data/Peak_quant
 
-featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.saf -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/HumanTotal_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/human/data/sort/*T-sort.bam -s 1
+#-s 0 is unstranded 
 
-featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.saf -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/HumanNuclear_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/human/data/sort/*N-sort.bam -s 1
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/HumanTotal_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/human/data/sort/*T-sort.bam -s 0
+
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/HumanNuclear_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/human/data/sort/*N-sort.bam -s 0
 
 
-featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.saf -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/ChimpTotal_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/chimp/data/sort/*T-sort.bam -s 1
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/ChimpTotal_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/chimp/data/sort/*T-sort.bam -s 0
 
-featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.saf -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/ChimpNuclear_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/chimp/data/sort/*N-sort.bam -s 1
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/Peak_quant/ChimpNuclear_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/chimp/data/sort/*N-sort.bam -s 0
 
 ```
 
 I need the matching peaks from human and chimps from the liftover pipeline data.  
 
 ```{r}
-PeakNames=read.table(file = "../data/liftover/HumanChimpPeaknames.txt", header=T)
+library(workflowr)
+library(tidyverse)
+library(reshape2)
+library(cowplot)
+```
+
+
+```{r}
+PeakNames=read.table(file = "../data/liftover/HumanChimpPeaknames.txt", header=T, stringsAsFactors = F)
+```
+
+Chimps:  
+
+* 18358  
+* 3622  
+* 3659  
+* 4973  
+* pt30  
+* pt91  
+
+Humans:  
+
+* 18498  
+* 18499 
+* 18502  
+* 18504  
+* 18510 
+* 18523   
+
+```{r}
+
+namesHN= c("human","Chr", "Start", "End", "Strand", "Length", "N18498", "N18499", "N18502", "N18504", "N18510", "N18523")
+humanNuc=read.table("../data/orthoPeak_quant/HumanNuclear_Orthopeak.quant", header = T, stringsAsFactors = F, col.names = namesHN)
+
+namesHT= c("human","Chr", "Start", "End", "Strand", "Length", "T18498", "T18499", "T18502", "T18504", "T18510", "T18523")
+humanTot=read.table("../data/orthoPeak_quant/HumanTotal_Orthopeak.quant", header=T, stringsAsFactors = F, col.names = namesHT)
+
+
+namesCN= c("chimp","Chr", "Start", "End", "Strand", "Length", "N18358", "N3622", "N3659", "N4973", "Npt30", "Npt91")
+
+chimpNuc=read.table("../data/orthoPeak_quant/ChimpNuclear_Orthopeak.quant", header = T,stringsAsFactors = F, col.names = namesCN)
+
+namesCT= c("chimp","Chr", "Start", "End", "Strand", "Length", "T18358", "T3622", "T3659", "T4973", "Tpt30", "Tpt91")
+chimpTot=read.table("../data/orthoPeak_quant/ChimpTotal_Orthopeak.quant", header=T, stringsAsFactors = F, col.names = namesCT)
+
+```
+
+
+I need to add the human names to the chimp file and chimp names to the human files.  
+
+```{r}
+humanNuc_ed= humanNuc %>% inner_join(PeakNames, by="human") %>% mutate(ID=paste(human,chimp, sep=":")) %>% select("ID",  "N18498", "N18499", "N18502", "N18504", "N18510", "N18523")
+
+humanTot_ed= humanTot %>% inner_join(PeakNames, by="human") %>%mutate(ID=paste(human,chimp, sep=":")) %>% select("ID",  "T18498", "T18499", "T18502", "T18504", "T18510", "T18523")
+
+chimpNuc_ed=chimpNuc %>% inner_join(PeakNames, by="chimp") %>% mutate(ID=paste(human,chimp, sep=":")) %>% select("ID", "N18358", "N3622", "N3659", "N4973", "Npt30", "Npt91")
+
+chimpTot_ed= chimpTot %>% inner_join(PeakNames, by="chimp") %>% mutate(ID=paste(human,chimp, sep=":")) %>% select("ID", "T18358", "T3622", "T3659", "T4973", "Tpt30", "Tpt91")
+
+``` 
+
+
+Now I need to join all of these together by the peaks.  
+
+```{r}
+allPeakQuant= humanNuc_ed %>% left_join(humanTot_ed, by="ID") %>% left_join(chimpNuc_ed, by="ID") %>% left_join(chimpTot_ed, by="ID") %>% column_to_rownames(var="ID")
+allPeakQuant_matrix=as.matrix(allPeakQuant) 
+```
+
+
+
+Run PCA:  
+
+
+
+```{r}
+
+humans=c("N18498", "N18499", "N18502", "N18504", "N18510", "N18523", "T18498", "T18499", "T18502", "T18504", "T18510", "T18523")
+pc=prcomp(allPeakQuant_matrix)
+rotation=data.frame(pc$rotation) %>% rownames_to_column(var="Sample") %>% mutate(Fraction=ifelse(grepl("N", Sample), "Nuclear", "Total")) %>% mutate(Species= ifelse(Sample %in% humans, "Human", "Chimp"))
+
+
+
+```
+
+
+Plot this:  
+
+```{r}
+prenormPCA=ggplot(rotation, aes(x=PC1, y=PC2, col=Species, shape=Fraction)) + geom_point() + labs(title="Prenormalization PCA")
+
+prenormPCA34=ggplot(rotation, aes(x=PC3, y=PC4, col=Species, shape=Fraction)) + geom_point() + labs(title="Prenormalization PCA")
+
+prenormPCA56=ggplot(rotation, aes(x=PC5, y=PC6, col=Species, shape=Fraction)) + geom_point() + labs(title="Prenormalization PCA")
+
+prenormPCA78=ggplot(rotation, aes(x=PC7, y=PC8, col=Species, shape=Fraction)) + geom_point() + labs(title="Prenormalization PCA")
+
+
+```
+
+
+
+
+
+```{r}
+plot_grid(prenormPCA,prenormPCA34, prenormPCA56, prenormPCA78)
 ```
 

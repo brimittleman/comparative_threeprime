@@ -263,13 +263,18 @@ library_order=order(read_stats$library)
 
 allPeakQuant_matrix_rpm=allPeakQuant_matrix_rpm[,order(library_order)]
 allPeakQuant_matrix=allPeakQuant_matrix[,order(library_order)]
-read_stats_T=read_stats%>% t
+read_stats_T=read_stats%>% t  
+
+
+#filter for more than 2 reads
+allPeakQuant_matrix_filt=ifelse(allPeakQuant_matrix<=2,0,allPeakQuant_matrix)
 
 
 
+#make RPM
 for (i in seq(1:ncol(allPeakQuant_matrix))) {
   x=as.integer(read_stats_T[2,i])/1000000
-  allPeakQuant_matrix_rpm[,i]=as.vector(allPeakQuant_matrix[,i])/x
+  allPeakQuant_matrix_rpm[,i]=as.vector(allPeakQuant_matrix_filt[,i])/x
 }
 
 
@@ -287,5 +292,33 @@ boxplot(log10(allPeakQuant_matrix_rpm + 1), main="log 10 RPM Counts + 1")
 plotDensities(log10(allPeakQuant_matrix_rpm+1), legend = "bottomright", main="RPM")
 abline(v = 0, lty = 3)
 ```
+Normalize by the sample RPM average for each sample: 
+```{r}
+RPM_mean=apply(allPeakQuant_matrix_rpm, 2,function(x)mean(x))
 
+
+allPeakQuant_matrix_rpm_Norm=allPeakQuant_matrix_rpm
+
+
+
+for (i in seq(1:ncol(allPeakQuant_matrix_rpm_Norm))) {
+  allPeakQuant_matrix_rpm_Norm[,i]=as.vector(allPeakQuant_matrix_rpm[,i])/RPM_mean[i]
+}
+
+```
+
+
+```{r}
+par(mfrow=c(2,1))
+boxplot(log10(allPeakQuant + 1), main="Log Raw Counts + 1")
+boxplot(log10(allPeakQuant_matrix_rpm_Norm + 1), main="Normalized log 10 RPM Counts + 1")
+
+```
+```{r}
+
+plotDensities(log10(allPeakQuant_matrix_rpm_Norm+1), legend = "bottomright", main="log10 normalized RPM + 1")
+abline(v = 0, lty = 3)
+```
+
+*I now have normalized values that are filtered for peaks that had >2 reads.*
 

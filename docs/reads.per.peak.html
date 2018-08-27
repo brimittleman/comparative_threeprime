@@ -346,7 +346,7 @@ div.section {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/2bcaafdd0d47b29b2dbbb8e58d4b4e956f1d1697" target="_blank">2bcaafd</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/eb8ceb80445a07870e784d40ad3d579293eaeb38" target="_blank">eb8ceb8</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -396,6 +396,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/eb8ceb80445a07870e784d40ad3d579293eaeb38/analysis/reads.per.peak.Rmd" target="_blank">eb8ceb8</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-27
+</td>
+<td style="text-align:left;">
+fix forma
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/brimittleman/comparative_threeprime/427dcd37ca8a9a32a984d76d356de0eb81f5250c/docs/reads.per.peak.html" target="_blank">427dcd3</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-27
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 html
@@ -1126,8 +1160,9 @@ brimittleman
 </table>
 <p></details></p>
 <p><em>I now have normalized values that are filtered for peaks that had &gt;2 reads.</em></p>
-<div id="differential-analysis" class="section level3">
-<h3>Differential analysis:</h3>
+</div>
+<div id="differential-analysis" class="section level2">
+<h2>Differential analysis:</h2>
 <p>I need to make a design matrix accounting for the two groups each sample can be in. It can be human chimp and total/nuclear. I could also run the analysis seperatly on total and nuclear and just look for differences between hunman and chimp first</p>
 <p>Expression matrix:</p>
 <pre class="r"><code>x=as.matrix(allPeakQuant_matrix_rpm_Norm)</code></pre>
@@ -1284,7 +1319,6 @@ Down            924
 NotSig        72448
 Up             2835</code></pre>
 <p>It looks like the most peaks are down regulated in total in comparison to nuclear. This makes sense because we expect more peaks to be used in the nuclear fraction.</p>
-</div>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>

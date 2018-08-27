@@ -322,3 +322,87 @@ abline(v = 0, lty = 3)
 
 *I now have normalized values that are filtered for peaks that had >2 reads.*
 
+
+###Differential analysis: 
+
+I need to make a design matrix accounting for the two groups each sample can be in. It can be human chimp and total/nuclear. I could also run the analysis seperatly on total and nuclear and just look for differences between hunman and chimp first
+
+Expression matrix:  
+
+```{r}
+x=as.matrix(allPeakQuant_matrix_rpm_Norm)
+```
+
+
+Create the feature data- this has 1 row per pas.  
+
+```{r}
+f=as.data.frame(rownames(allPeakQuant_matrix_rpm_Norm)) 
+colnames(f)= c("ID") 
+f = f %>% separate(ID, into=c("Human", "Chimp"), remove = F, sep=":") %>% mutate(name=ID) 
+f = f %>% column_to_rownames("name")
+```
+
+
+Create phenotype data frame:  
+
+```{r}
+p=read.csv("../data/comp.pheno.data.csv",header = T)
+p= p %>% column_to_rownames(var="Sample")
+```
+
+
+Try a boxplot with these: 
+```{r}
+boxplot(x[1,]~p[,"Species"], main=f[1,"ID"]) 
+boxplot(x[1,]~p[,"Fraction"], main=f[1,"ID"]) 
+
+
+```
+Create expression set object:  
+```{r}
+library(Biobase)
+eset=ExpressionSet(assayData = x,
+                   phenoData = AnnotatedDataFrame(p),
+                   featureData = AnnotatedDataFrame(f))
+```
+
+
+
+Limma package for DE. Problem, emprical bayes probably relies on independent genes. Some of these peaks go to the same gene, therefore are not indep. I get around this when i use the leafcutter phenotype that is usage of the peak compared to others in the gene. (ill do this later)
+
+First I will do human/chimp as explanatory. 
+
+```{r}
+library(limma)
+design=model.matrix(~ Species , data=pData(eset))
+fit=lmFit(eset,design)
+fit=eBayes(fit)
+results=decideTests(fit[,"SpeciesHuman"])
+summary(results)
+
+```
+
+Second I can do this against fraction:  
+
+```{r}
+design2=model.matrix(~ Fraction , data=pData(eset))
+fit2=lmFit(eset,design2)
+fit2=eBayes(fit2)
+results2=decideTests(fit2[,"FractionTotal"])
+summary(results2)
+```
+Try with both
+```{r}
+
+design3=model.matrix(~ Fraction + Species , data=pData(eset))
+fit3=lmFit(eset,design3)
+fit3=eBayes(fit3)
+results3a=decideTests(fit3[,"FractionTotal"])
+results3b=decideTests(fit3[,"SpeciesHuman"])
+summary(results3a)
+summary(results3b)
+```
+
+It looks like the most peaks are down regulated in total in comparison to nuclear. This makes sense because we expect more peaks to be used in the nuclear fraction.  
+

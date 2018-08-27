@@ -346,18 +346,20 @@ div.section {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/bb29739e93ef78144353de1a7f7a42e815d61b70" target="_blank">bb29739</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/023d0d7feb29bf7d3359c2347751b5eeb1533623" target="_blank">023d0d7</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
     Ignored:    .RData
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
 
 Untracked files:
     Untracked:  com_threeprime.Rproj
     Untracked:  data/PeakPerExon/
     Untracked:  data/PeakPerGene/
+    Untracked:  data/comp.pheno.data.csv
     Untracked:  data/dist_TES/
     Untracked:  data/dist_upexon/
     Untracked:  data/liftover/
@@ -395,6 +397,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/brimittleman/comparative_threeprime/6680d6f154bf2733ee157645225a031bdfb4de72/docs/reads.per.peak.html" target="_blank">6680d6f</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-27
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 Rmd
@@ -945,6 +964,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/6680d6f154bf2733ee157645225a031bdfb4de72/docs/figure/reads.per.peak.Rmd/unnamed-chunk-16-1.png" target="_blank">6680d6f</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-27
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/brimittleman/comparative_threeprime/blob/5049ea1e4238a6e0d9f46b2de39b2f9a0a4fe58b/docs/figure/reads.per.peak.Rmd/unnamed-chunk-16-1.png" target="_blank">5049ea1</a>
 </td>
 <td style="text-align:left;">
@@ -978,6 +1008,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/6680d6f154bf2733ee157645225a031bdfb4de72/docs/figure/reads.per.peak.Rmd/unnamed-chunk-17-1.png" target="_blank">6680d6f</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-27
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/brimittleman/comparative_threeprime/blob/5049ea1e4238a6e0d9f46b2de39b2f9a0a4fe58b/docs/figure/reads.per.peak.Rmd/unnamed-chunk-17-1.png" target="_blank">5049ea1</a>
 </td>
 <td style="text-align:left;">
@@ -1005,10 +1046,168 @@ for (i in seq(1:ncol(allPeakQuant_matrix_rpm_Norm))) {
 boxplot(log10(allPeakQuant + 1), main=&quot;Log Raw Counts + 1&quot;)
 boxplot(log10(allPeakQuant_matrix_rpm_Norm + 1), main=&quot;Normalized log 10 RPM Counts + 1&quot;)</code></pre>
 <p><img src="figure/reads.per.peak.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details> <summary><em>Expand here to see past versions of unnamed-chunk-19-1.png:</em></summary>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/6680d6f154bf2733ee157645225a031bdfb4de72/docs/figure/reads.per.peak.Rmd/unnamed-chunk-19-1.png" target="_blank">6680d6f</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-27
+</td>
+</tr>
+</tbody>
+</table>
+<p></details></p>
 <pre class="r"><code>plotDensities(log10(allPeakQuant_matrix_rpm_Norm+1), legend = &quot;bottomright&quot;, main=&quot;log10 normalized RPM + 1&quot;)
 abline(v = 0, lty = 3)</code></pre>
 <p><img src="figure/reads.per.peak.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details> <summary><em>Expand here to see past versions of unnamed-chunk-20-1.png:</em></summary>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/6680d6f154bf2733ee157645225a031bdfb4de72/docs/figure/reads.per.peak.Rmd/unnamed-chunk-20-1.png" target="_blank">6680d6f</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-27
+</td>
+</tr>
+</tbody>
+</table>
+<p></details></p>
 <p><em>I now have normalized values that are filtered for peaks that had &gt;2 reads.</em></p>
+<div id="differential-analysis" class="section level3">
+<h3>Differential analysis:</h3>
+<p>I need to make a design matrix accounting for the two groups each sample can be in. It can be human chimp and total/nuclear. I could also run the analysis seperatly on total and nuclear and just look for differences between hunman and chimp first</p>
+<p>Expression matrix:</p>
+<pre class="r"><code>x=as.matrix(allPeakQuant_matrix_rpm_Norm)</code></pre>
+<p>Create the feature data- this has 1 row per pas.</p>
+<pre class="r"><code>f=as.data.frame(rownames(allPeakQuant_matrix_rpm_Norm)) 
+colnames(f)= c(&quot;ID&quot;) 
+f = f %&gt;% separate(ID, into=c(&quot;Human&quot;, &quot;Chimp&quot;), remove = F, sep=&quot;:&quot;) %&gt;% mutate(name=ID) 
+f = f %&gt;% column_to_rownames(&quot;name&quot;)</code></pre>
+<p>Create phenotype data frame:</p>
+<pre class="r"><code>p=read.csv(&quot;../data/comp.pheno.data.csv&quot;,header = T)
+p= p %&gt;% column_to_rownames(var=&quot;Sample&quot;)</code></pre>
+<p>Try a boxplot with these:</p>
+<pre class="r"><code>boxplot(x[1,]~p[,&quot;Species&quot;], main=f[1,&quot;ID&quot;]) </code></pre>
+<p><img src="figure/reads.per.peak.Rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>boxplot(x[1,]~p[,&quot;Fraction&quot;], main=f[1,&quot;ID&quot;]) </code></pre>
+<p><img src="figure/reads.per.peak.Rmd/unnamed-chunk-24-2.png" width="672" style="display: block; margin: auto;" /> Create expression set object:</p>
+<pre class="r"><code>library(Biobase)</code></pre>
+<pre><code>Loading required package: BiocGenerics</code></pre>
+<pre><code>Loading required package: parallel</code></pre>
+<pre><code>
+Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:parallel&#39;:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB</code></pre>
+<pre><code>The following object is masked from &#39;package:limma&#39;:
+
+    plotMA</code></pre>
+<pre><code>The following objects are masked from &#39;package:dplyr&#39;:
+
+    combine, intersect, setdiff, union</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    IQR, mad, sd, var, xtabs</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    anyDuplicated, append, as.data.frame, basename, cbind,
+    colMeans, colnames, colSums, dirname, do.call, duplicated,
+    eval, evalq, Filter, Find, get, grep, grepl, intersect,
+    is.unsorted, lapply, lengths, Map, mapply, match, mget, order,
+    paste, pmax, pmax.int, pmin, pmin.int, Position, rank, rbind,
+    Reduce, rowMeans, rownames, rowSums, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which, which.max,
+    which.min</code></pre>
+<pre><code>Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    &#39;browseVignettes()&#39;. To cite Bioconductor, see
+    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
+<pre class="r"><code>eset=ExpressionSet(assayData = x,
+                   phenoData = AnnotatedDataFrame(p),
+                   featureData = AnnotatedDataFrame(f))</code></pre>
+<p>Limma package for DE. Problem, emprical bayes probably relies on independent genes. Some of these peaks go to the same gene, therefore are not indep. I get around this when i use the leafcutter phenotype that is usage of the peak compared to others in the gene. (ill do this later)</p>
+<p>First I will do human/chimp as explanatory.</p>
+<pre class="r"><code>library(limma)
+design=model.matrix(~ Species , data=pData(eset))
+fit=lmFit(eset,design)
+fit=eBayes(fit)</code></pre>
+<pre><code>Warning: Zero sample variances detected, have been offset away from zero</code></pre>
+<pre class="r"><code>results=decideTests(fit[,&quot;SpeciesHuman&quot;])
+summary(results)</code></pre>
+<pre><code>       SpeciesHuman
+Down            287
+NotSig        75473
+Up              447</code></pre>
+<p>Second I can do this against fraction:</p>
+<pre class="r"><code>design2=model.matrix(~ Fraction , data=pData(eset))
+fit2=lmFit(eset,design2)
+fit2=eBayes(fit2)</code></pre>
+<pre><code>Warning: Zero sample variances detected, have been offset away from zero</code></pre>
+<pre class="r"><code>results2=decideTests(fit2[,&quot;FractionTotal&quot;])
+summary(results2)</code></pre>
+<pre><code>       FractionTotal
+Down           29626
+NotSig         43158
+Up              3423</code></pre>
+<p>Try with both</p>
+<pre class="r"><code>design3=model.matrix(~ Fraction + Species , data=pData(eset))
+fit3=lmFit(eset,design3)
+fit3=eBayes(fit3)</code></pre>
+<pre><code>Warning: Zero sample variances detected, have been offset away from zero</code></pre>
+<pre class="r"><code>results3a=decideTests(fit3[,&quot;FractionTotal&quot;])
+results3b=decideTests(fit3[,&quot;SpeciesHuman&quot;])
+summary(results3a)</code></pre>
+<pre><code>       FractionTotal
+Down           32068
+NotSig         40450
+Up              3689</code></pre>
+<pre class="r"><code>summary(results3b)</code></pre>
+<pre><code>       SpeciesHuman
+Down            924
+NotSig        72448
+Up             2835</code></pre>
+<p>It looks like the most peaks are down regulated in total in comparison to nuclear. This makes sense because we expect more peaks to be used in the nuclear fraction.</p>
+</div>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
@@ -1025,20 +1224,23 @@ locale:
 [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
 
 attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
+[1] parallel  stats     graphics  grDevices utils     datasets  methods  
+[8] base     
 
 other attached packages:
- [1] edgeR_3.22.3    limma_3.36.2    bindrcpp_0.2.2  cowplot_0.9.3  
- [5] reshape2_1.4.3  forcats_0.3.0   stringr_1.3.1   dplyr_0.7.6    
- [9] purrr_0.2.5     readr_1.1.1     tidyr_0.8.1     tibble_1.4.2   
-[13] ggplot2_3.0.0   tidyverse_1.2.1 workflowr_1.1.1
+ [1] Biobase_2.40.0      BiocGenerics_0.26.0 edgeR_3.22.3       
+ [4] limma_3.36.3        bindrcpp_0.2.2      cowplot_0.9.3      
+ [7] reshape2_1.4.3      forcats_0.3.0       stringr_1.3.1      
+[10] dplyr_0.7.6         purrr_0.2.5         readr_1.1.1        
+[13] tidyr_0.8.1         tibble_1.4.2        ggplot2_3.0.0      
+[16] tidyverse_1.2.1     workflowr_1.1.1    
 
 loaded via a namespace (and not attached):
  [1] locfit_1.5-9.1    tidyselect_0.2.4  haven_1.1.2      
  [4] lattice_0.20-35   colorspace_1.3-2  htmltools_0.3.6  
  [7] yaml_2.2.0        rlang_0.2.2       R.oo_1.22.0      
 [10] pillar_1.3.0      glue_1.3.0        withr_2.1.2      
-[13] R.utils_2.6.0     modelr_0.1.2      readxl_1.1.0     
+[13] R.utils_2.7.0     modelr_0.1.2      readxl_1.1.0     
 [16] bindr_0.1.1       plyr_1.8.4        munsell_0.5.0    
 [19] gtable_0.2.0      cellranger_1.1.0  rvest_0.3.2      
 [22] R.methodsS3_1.7.1 evaluate_0.11     labeling_0.3     

@@ -346,14 +346,13 @@ div.section {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/686bab0f18fc3934d926aa0f195af6c844ea801c" target="_blank">686bab0</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/bb29739e93ef78144353de1a7f7a42e815d61b70" target="_blank">bb29739</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
     Ignored:    .RData
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
 
 Untracked files:
     Untracked:  com_threeprime.Rproj
@@ -396,6 +395,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/bb29739e93ef78144353de1a7f7a42e815d61b70/analysis/reads.per.peak.Rmd" target="_blank">bb29739</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-27
+</td>
+<td style="text-align:left;">
+norm and filter
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/brimittleman/comparative_threeprime/5049ea1e4238a6e0d9f46b2de39b2f9a0a4fe58b/docs/reads.per.peak.html" target="_blank">5049ea1</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-27
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 Rmd
@@ -877,21 +910,105 @@ library_order=order(read_stats$library)
 
 allPeakQuant_matrix_rpm=allPeakQuant_matrix_rpm[,order(library_order)]
 allPeakQuant_matrix=allPeakQuant_matrix[,order(library_order)]
-read_stats_T=read_stats%&gt;% t
+read_stats_T=read_stats%&gt;% t  
+
+
+#filter for more than 2 reads
+allPeakQuant_matrix_filt=ifelse(allPeakQuant_matrix&lt;=2,0,allPeakQuant_matrix)
 
 
 
+#make RPM
 for (i in seq(1:ncol(allPeakQuant_matrix))) {
   x=as.integer(read_stats_T[2,i])/1000000
-  allPeakQuant_matrix_rpm[,i]=as.vector(allPeakQuant_matrix[,i])/x
+  allPeakQuant_matrix_rpm[,i]=as.vector(allPeakQuant_matrix_filt[,i])/x
 }</code></pre>
 <pre class="r"><code>par(mfrow=c(2,1))
 boxplot(log10(allPeakQuant + 1), main=&quot;Log Raw Counts + 1&quot;)
 boxplot(log10(allPeakQuant_matrix_rpm + 1), main=&quot;log 10 RPM Counts + 1&quot;)</code></pre>
 <p><img src="figure/reads.per.peak.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details> <summary><em>Expand here to see past versions of unnamed-chunk-16-1.png:</em></summary>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/5049ea1e4238a6e0d9f46b2de39b2f9a0a4fe58b/docs/figure/reads.per.peak.Rmd/unnamed-chunk-16-1.png" target="_blank">5049ea1</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-27
+</td>
+</tr>
+</tbody>
+</table>
+<p></details></p>
 <pre class="r"><code>plotDensities(log10(allPeakQuant_matrix_rpm+1), legend = &quot;bottomright&quot;, main=&quot;RPM&quot;)
 abline(v = 0, lty = 3)</code></pre>
 <p><img src="figure/reads.per.peak.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details> <summary><em>Expand here to see past versions of unnamed-chunk-17-1.png:</em></summary>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/5049ea1e4238a6e0d9f46b2de39b2f9a0a4fe58b/docs/figure/reads.per.peak.Rmd/unnamed-chunk-17-1.png" target="_blank">5049ea1</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-27
+</td>
+</tr>
+</tbody>
+</table>
+<p></details></p>
+<p>Normalize by the sample RPM average for each sample:</p>
+<pre class="r"><code>RPM_mean=apply(allPeakQuant_matrix_rpm, 2,function(x)mean(x))
+
+
+allPeakQuant_matrix_rpm_Norm=allPeakQuant_matrix_rpm
+
+
+
+for (i in seq(1:ncol(allPeakQuant_matrix_rpm_Norm))) {
+  allPeakQuant_matrix_rpm_Norm[,i]=as.vector(allPeakQuant_matrix_rpm[,i])/RPM_mean[i]
+}</code></pre>
+<pre class="r"><code>par(mfrow=c(2,1))
+boxplot(log10(allPeakQuant + 1), main=&quot;Log Raw Counts + 1&quot;)
+boxplot(log10(allPeakQuant_matrix_rpm_Norm + 1), main=&quot;Normalized log 10 RPM Counts + 1&quot;)</code></pre>
+<p><img src="figure/reads.per.peak.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plotDensities(log10(allPeakQuant_matrix_rpm_Norm+1), legend = &quot;bottomright&quot;, main=&quot;log10 normalized RPM + 1&quot;)
+abline(v = 0, lty = 3)</code></pre>
+<p><img src="figure/reads.per.peak.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><em>I now have normalized values that are filtered for peaks that had &gt;2 reads.</em></p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>

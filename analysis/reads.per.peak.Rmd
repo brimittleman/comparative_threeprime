@@ -391,8 +391,13 @@ fit2=lmFit(eset,design2)
 fit2=eBayes(fit2)
 results2=decideTests(fit2[,"FractionTotal"])
 summary(results2)
+
 ```
 Try with both
+
+$y = \beta + \beta_{F}x_{F} + \beta_{S}x_{S} + \epsilon$
+
+The intercept is the chimp nuclear samples because 1 for F is total and S for 1 is human.  
 ```{r}
 
 design3=model.matrix(~ Fraction + Species , data=pData(eset))
@@ -402,6 +407,7 @@ results3a=decideTests(fit3[,"FractionTotal"])
 results3b=decideTests(fit3[,"SpeciesHuman"])
 summary(results3a)
 summary(results3b)
+
 ```
 
 It looks like the most peaks are down regulated in total in comparison to nuclear. This makes sense because we expect more peaks to be used in the nuclear fraction.  

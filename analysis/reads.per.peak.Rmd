@@ -323,7 +323,7 @@ abline(v = 0, lty = 3)
 *I now have normalized values that are filtered for peaks that had >2 reads.*
 
 
-###Differential analysis: 
+##Differential analysis: 
 
 I need to make a design matrix accounting for the two groups each sample can be in. It can be human chimp and total/nuclear. I could also run the analysis seperatly on total and nuclear and just look for differences between hunman and chimp first
 

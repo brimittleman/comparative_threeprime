@@ -322,7 +322,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-08-24</p>
+<p><strong>Last updated:</strong> 2018-08-28</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -346,27 +346,27 @@ div.section {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/364f3303353ad3cf97203e1b8294d4fa2ed3bbed" target="_blank">364f330</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/8f61cee52fe61dfcffc4e0a2451b13512240efa4" target="_blank">8f61cee</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
     Ignored:    .RData
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
 
 Untracked files:
     Untracked:  com_threeprime.Rproj
     Untracked:  data/PeakPerExon/
     Untracked:  data/PeakPerGene/
+    Untracked:  data/comp.pheno.data.csv
     Untracked:  data/dist_TES/
     Untracked:  data/dist_upexon/
     Untracked:  data/liftover/
     Untracked:  data/map.stats.csv
     Untracked:  data/map.stats.xlsx
+    Untracked:  data/orthoPeak_quant/
 
 Unstaged changes:
-    Modified:   analysis/index.Rmd
     Deleted:    comparitive_threeprime.Rproj
 
 </code></pre>
@@ -396,6 +396,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/8f61cee52fe61dfcffc4e0a2451b13512240efa4/analysis/characterize.ortho.peaks.Rmd" target="_blank">8f61cee</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-28
+</td>
+<td style="text-align:left;">
+add plot recreating wang et al 2018
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/brimittleman/comparative_threeprime/a23786505be6da399bd69014fa9a9e5e19902880/docs/characterize.ortho.peaks.html" target="_blank">a237865</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-24
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 Rmd
@@ -498,12 +532,12 @@ bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/
 bedtools closest -id -D a -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.bed -b /project2/gilad/briana/genome_anotation_data/ortho_exon/2017_July_ortho_human.small.sort.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/dist_upexon/Human.distUpstreamexon.txt</code></pre>
 <p>Import the files and plot the distances.</p>
 <pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>── Attaching packages ──────────────────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>── Attaching packages ─────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
 <pre><code>✔ ggplot2 3.0.0     ✔ purrr   0.2.5
 ✔ tibble  1.4.2     ✔ dplyr   0.7.6
 ✔ tidyr   0.8.1     ✔ stringr 1.3.1
 ✔ readr   1.1.1     ✔ forcats 0.3.0</code></pre>
-<pre><code>── Conflicts ─────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+<pre><code>── Conflicts ────────────────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()</code></pre>
 <pre class="r"><code>library(workflowr)</code></pre>
@@ -666,21 +700,120 @@ bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_d
 
 
 bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/chimpGene_refGene_mRNA_sort.bed -b /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.bed &gt; /project2/gilad/briana/comparitive_threeprime/data/PeakPerGene/chimpOrthoPeakPerGene.bed</code></pre>
-<pre class="r"><code>human_peakpergene= read.table(&quot;../data/PeakPerGene/humanOrthoPeakPerGene.bed&quot;, header=F, stringsAsFactors = F,col.names = c(&quot;chr&quot;, &quot;start&quot;, &quot;end&quot;, &quot;gene&quot;, &quot;score&quot;, &quot;strand&quot;, &quot;numPeaks&quot;)) %&gt;% mutate(spec= &quot;H&quot;) %&gt;% filter(numPeaks &gt; 0)
+<pre class="r"><code>human_peakpergene= read.table(&quot;../data/PeakPerGene/humanOrthoPeakPerGene.bed&quot;, header=F, stringsAsFactors = F,col.names = c(&quot;chr&quot;, &quot;start&quot;, &quot;end&quot;, &quot;gene&quot;, &quot;score&quot;, &quot;strand&quot;, &quot;numPeaks&quot;)) %&gt;% mutate(spec= &quot;H&quot;) 
 
 summary(human_peakpergene$numPeaks)</code></pre>
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  1.000   2.000   4.000   9.073  11.000 206.000 </code></pre>
-<pre class="r"><code>chimp_peakpergene= read.table(&quot;../data/PeakPerGene/chimpOrthoPeakPerGene.bed&quot;, stringsAsFactors = F, header = F, col.names = c(&quot;chr&quot;, &quot;start&quot;, &quot;end&quot;, &quot;gene&quot;, &quot;score&quot;, &quot;strand&quot;, &quot;numPeaks&quot;)) %&gt;% mutate(spec=&quot;C&quot;) %&gt;% filter(numPeaks &gt; 0)
+  0.000   0.000   0.000   3.924   3.000 206.000 </code></pre>
+<pre class="r"><code>chimp_peakpergene= read.table(&quot;../data/PeakPerGene/chimpOrthoPeakPerGene.bed&quot;, stringsAsFactors = F, header = F, col.names = c(&quot;chr&quot;, &quot;start&quot;, &quot;end&quot;, &quot;gene&quot;, &quot;score&quot;, &quot;strand&quot;, &quot;numPeaks&quot;)) %&gt;% mutate(spec=&quot;C&quot;) 
 
 
 summary(chimp_peakpergene$numPeaks)</code></pre>
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-  1.000   2.000   4.000   6.121   7.000  95.000 </code></pre>
+  0.000   0.000   0.000   2.684   3.000  95.000 </code></pre>
 <pre class="r"><code>humanPPG=ggplot(human_peakpergene, aes(x=log10(numPeaks))) + geom_density(fill=&quot;Red&quot;) + labs(title=&quot;Peaks per Gene \n Human mRNA&quot;)
 chimpPPG=ggplot(chimp_peakpergene, aes(x=log10(numPeaks))) + geom_density(fill=&quot;Blue&quot;) + labs(title=&quot;Peaks per Gene \n Chimp mRNA&quot;)
 plot_grid(humanPPG, chimpPPG)</code></pre>
+<pre><code>Warning: Removed 27137 rows containing non-finite values (stat_density).</code></pre>
+<pre><code>Warning: Removed 1218 rows containing non-finite values (stat_density).</code></pre>
 <p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details> <summary><em>Expand here to see past versions of unnamed-chunk-11-1.png:</em></summary>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/a23786505be6da399bd69014fa9a9e5e19902880/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-11-1.png" target="_blank">a237865</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-24
+</td>
+</tr>
+</tbody>
+</table>
+<p></details></p>
+<div id="genes-with-conserved-pas" class="section level4">
+<h4>Genes with conserved PAS</h4>
+<p>I will follow a similar strategy to Wang et al. 2018 to make a plot similar to plot 1d. I want the percent of genes in both species with conserved PAS.</p>
+<pre class="r"><code>chimp_peakpergene= chimp_peakpergene %&gt;% mutate(oneConservedPeak=ifelse(numPeaks==1, 1, 0 )) %&gt;% mutate(multConservedPeak= ifelse(numPeaks &gt; 1, 1, 0))
+
+
+Cgenes1peak=sum(chimp_peakpergene$oneConservedPeak)/nrow(chimp_peakpergene)
+CgenesMultpeak=sum(chimp_peakpergene$multConservedPeak)/nrow(chimp_peakpergene)
+Cgenes0peak=1- CgenesMultpeak - Cgenes1peak
+
+human_peakpergene = human_peakpergene %&gt;% mutate(oneConservedPeak=ifelse(numPeaks==1, 1,0)) %&gt;% mutate(multConservedPeak=ifelse(numPeaks &gt;1,1,0))
+
+
+Hgenes1peak=sum(human_peakpergene$oneConservedPeak) / nrow(human_peakpergene) 
+HgenesMultpeak=sum(human_peakpergene$multConservedPeak)/ nrow(human_peakpergene)
+Hgenes0peak=1- HgenesMultpeak - Hgenes1peak</code></pre>
+<p>I want to create a data frame with these numbers to plot it.</p>
+<pre class="r"><code>Hgene_peak=c(Hgenes0peak,Hgenes1peak,HgenesMultpeak)
+Cgene_peak=c(Cgenes0peak, Cgenes1peak, CgenesMultpeak)
+both_gene_peak=as.data.frame(rbind(Hgene_peak, Cgene_peak))
+colnames(both_gene_peak)= c(&quot;ZeroConserved&quot;, &quot;OneConserved&quot;, &quot;MultConserved&quot;)
+rownames(both_gene_peak)=c(&quot;Human&quot;, &quot;Chimp&quot;)
+both_gene_peak= both_gene_peak %&gt;% rownames_to_column(var=&quot;Species&quot;)
+
+both_gene_peak_melt=melt(both_gene_peak, id.vars =&quot;Species&quot;)
+
+#add average number of conserved peak per gene 
+avgH=round(mean(human_peakpergene$numPeaks),digits = 3)
+avgC=round(mean(chimp_peakpergene$numPeaks),digits = 3)</code></pre>
+<p>Plot this:</p>
+<pre class="r"><code>genepeakplot= ggplot(both_gene_peak_melt, aes(x=Species, fill=variable, y=value)) + geom_bar(stat=&quot;identity&quot;, position = &quot;fill&quot;) + labs(y=&quot;Prop of Protein Coding Genes&quot;, title=&quot;Conserved peaks \n in protein coding genes&quot;) + scale_fill_discrete(name = &quot;Number of \nConserved Peaks&quot;, labels=c(&quot;Zero&quot;,&quot;One&quot;, &quot;Multiple&quot;)) + annotate(&quot;text&quot;, x=1, y=.8, label= paste(&quot;avg peaks\n per gene \n&quot;, avgH, sep=&quot; &quot;)) + annotate(&quot;text&quot;, x = 2, y=.8, label = paste(&quot;avg peaks\n per gene \n&quot;, avgC, sep=&quot; &quot;))
+  
+genepeakplot</code></pre>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details> <summary><em>Expand here to see past versions of unnamed-chunk-14-1.png:</em></summary>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/a23786505be6da399bd69014fa9a9e5e19902880/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-14-1.png" target="_blank">a237865</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-24
+</td>
+</tr>
+</tbody>
+</table>
+<p></details></p>
+</div>
+<div id="conserved-exons" class="section level4">
+<h4>Conserved exons</h4>
 <p>I can run similar code on the conserved exons. We expect similar distribution but most of the exons will have 0. This is the primary reason to use conserved peaks in three prime bias data.</p>
 <pre class="bash"><code>#!/bin/bash
 
@@ -718,7 +851,7 @@ summary(chimp_peakperexon$numPeaks)</code></pre>
 <pre class="r"><code>humanPPE=ggplot(human_peakperexon, aes(x=numPeaks)) + geom_density(fill=&quot;Red&quot;) + labs(title=&quot;Peaks per Exon \n Human&quot;)
 chimpPPE=ggplot(chimp_peakperexon, aes(x=numPeaks)) + geom_density(fill=&quot;Blue&quot;) + labs(title=&quot;Peaks per Exon \n Chimp &quot;)
 plot_grid(humanPPE, chimpPPE)</code></pre>
-<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /> Most of the exons have 0 peaks. This is expected. I want to look at how many 0s, 1s ect we have in each data set.</p>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /> Most of the exons have 0 peaks. This is expected. I want to look at how many 0s, 1s ect we have in each data set.</p>
 <pre class="r"><code>human_exoncounts=human_peakperexon %&gt;% count(numPeaks)
 
 chimp_exoncounts=chimp_peakperexon %&gt;% count(numPeaks)
@@ -733,7 +866,38 @@ both_exon_melt=melt(both_exon, measure.vars =c(&quot;Human&quot;, &quot;Chimp&qu
 
 
 ggplot(both_exon_melt, aes(x=PeakNum, y=value, col=variable)) + geom_point( size=3) + facet_grid(~variable) + labs(y=&quot;Exons&quot;, title=&quot;Number of peaks per conserved exons&quot;)</code></pre>
-<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details> <summary><em>Expand here to see past versions of unnamed-chunk-18-1.png:</em></summary>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/a23786505be6da399bd69014fa9a9e5e19902880/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-18-1.png" target="_blank">a237865</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-24
+</td>
+</tr>
+</tbody>
+</table>
+<p></details></p>
+</div>
 </div>
 <div id="distance-to-tes" class="section level3">
 <h3>Distance to TES</h3>
@@ -768,7 +932,38 @@ huTES=ggplot(human_TESdis, aes(x=logdis)) + geom_density(fill=&quot;red&quot;) +
 
 
 plot_grid(huTES, chTES)</code></pre>
-<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /> Flip this and do distance from teh TES to the peak.</p>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details> <summary><em>Expand here to see past versions of unnamed-chunk-21-1.png:</em></summary>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/a23786505be6da399bd69014fa9a9e5e19902880/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-21-1.png" target="_blank">a237865</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-24
+</td>
+</tr>
+</tbody>
+</table>
+<p></details></p>
+<p>Flip this and do distance from teh TES to the peak.</p>
 <pre class="bash"><code>#!/bin/bash
 
 #SBATCH --job-name=disTES2Peak
@@ -799,7 +994,7 @@ huTES2=ggplot(human_TES2dis, aes(x=logdis)) + geom_density(fill=&quot;red&quot;)
 
 
 plot_grid(huTES2, chTES2)</code></pre>
-<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="session-information" class="section level2">
@@ -827,19 +1022,19 @@ other attached packages:
 
 loaded via a namespace (and not attached):
  [1] tidyselect_0.2.4  haven_1.1.2       lattice_0.20-35  
- [4] colorspace_1.3-2  htmltools_0.3.6   yaml_2.1.19      
- [7] rlang_0.2.1       R.oo_1.22.0       pillar_1.3.0     
-[10] glue_1.3.0        withr_2.1.2       R.utils_2.6.0    
+ [4] colorspace_1.3-2  htmltools_0.3.6   yaml_2.2.0       
+ [7] rlang_0.2.2       R.oo_1.22.0       pillar_1.3.0     
+[10] glue_1.3.0        withr_2.1.2       R.utils_2.7.0    
 [13] modelr_0.1.2      readxl_1.1.0      bindr_0.1.1      
 [16] plyr_1.8.4        munsell_0.5.0     gtable_0.2.0     
 [19] cellranger_1.1.0  rvest_0.3.2       R.methodsS3_1.7.1
 [22] evaluate_0.11     labeling_0.3      knitr_1.20       
-[25] broom_0.5.0       Rcpp_0.12.18      scales_0.5.0     
+[25] broom_0.5.0       Rcpp_0.12.18      scales_1.0.0     
 [28] backports_1.1.2   jsonlite_1.5      hms_0.4.2        
-[31] digest_0.6.15     stringi_1.2.4     grid_3.5.1       
+[31] digest_0.6.16     stringi_1.2.4     grid_3.5.1       
 [34] rprojroot_1.3-2   cli_1.0.0         tools_3.5.1      
 [37] magrittr_1.5      lazyeval_0.2.1    crayon_1.3.4     
-[40] whisker_0.3-2     pkgconfig_2.0.1   xml2_1.2.0       
+[40] whisker_0.3-2     pkgconfig_2.0.2   xml2_1.2.0       
 [43] lubridate_1.7.4   assertthat_0.2.0  rmarkdown_1.10   
 [46] httr_1.3.1        rstudioapi_0.7    R6_2.2.2         
 [49] nlme_3.1-137      git2r_0.23.0      compiler_3.5.1   </code></pre>

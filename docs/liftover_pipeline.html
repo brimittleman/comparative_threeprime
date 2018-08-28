@@ -322,7 +322,7 @@ div.section {
 </div>
 
 
-<p><strong>Last updated:</strong> 2018-08-24</p>
+<p><strong>Last updated:</strong> 2018-08-28</p>
 <strong>workflowr checks:</strong> <small>(Click a bullet for more information)</small>
 <ul>
 <li>
@@ -346,7 +346,7 @@ div.section {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/c39776db4ca233592ed83aa178901d346ab4ebdf" target="_blank">c39776d</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/f670cfae71fb2259cafdd5a80baf542cdab81c75" target="_blank">f670cfa</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
@@ -355,18 +355,18 @@ Ignored files:
     Ignored:    .Rproj.user/
 
 Untracked files:
-    Untracked:  analysis/reads.per.peak.Rmd
     Untracked:  com_threeprime.Rproj
     Untracked:  data/PeakPerExon/
     Untracked:  data/PeakPerGene/
+    Untracked:  data/comp.pheno.data.csv
     Untracked:  data/dist_TES/
     Untracked:  data/dist_upexon/
     Untracked:  data/liftover/
     Untracked:  data/map.stats.csv
     Untracked:  data/map.stats.xlsx
+    Untracked:  data/orthoPeak_quant/
 
 Unstaged changes:
-    Modified:   analysis/index.Rmd
     Deleted:    comparitive_threeprime.Rproj
 
 </code></pre>
@@ -396,6 +396,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/f670cfae71fb2259cafdd5a80baf542cdab81c75/analysis/liftover_pipeline.Rmd" target="_blank">f670cfa</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-28
+</td>
+<td style="text-align:left;">
+add plot for num conserved peaks
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/brimittleman/comparative_threeprime/bb880d8f8f534b4fa28761cc5e40a70da96bdcf9/docs/liftover_pipeline.html" target="_blank">bb880d8</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-24
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 Rmd
@@ -596,6 +630,21 @@ Attaching package: &#39;dplyr&#39;</code></pre>
 <pre class="r"><code>library(workflowr)</code></pre>
 <pre><code>This is workflowr version 1.1.1
 Run ?workflowr for help getting started</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>── Attaching packages ─────────────────────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>✔ ggplot2 3.0.0     ✔ readr   1.1.1
+✔ tibble  1.4.2     ✔ purrr   0.2.5
+✔ tidyr   0.8.1     ✔ stringr 1.3.1
+✔ ggplot2 3.0.0     ✔ forcats 0.3.0</code></pre>
+<pre><code>── Conflicts ────────────────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(reshape2)</code></pre>
+<pre><code>
+Attaching package: &#39;reshape2&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:tidyr&#39;:
+
+    smiths</code></pre>
 <pre class="r"><code>#human rev is in human coordinates 
 human_rev= read.table(&quot;../data/liftover/filtered_humanPeakslifted_reverse.bed&quot;, col.names = c(&quot;human_chr&quot;, &quot;human_start&quot;, &quot;human_end&quot;, &quot;name&quot;), stringsAsFactors = F)
 
@@ -632,6 +681,28 @@ write.table(chimp_ortho, file=&quot;../data/liftover/chimpOrthoPeaks.bed&quot;, 
 write.table(peak_names, file=&quot;../data/liftover/HumanChimpPeaknames.txt&quot;, quote=F, row.names = F, col.names = T, sep=&quot;\t&quot;)</code></pre>
 </div>
 </div>
+<div id="plot-results" class="section level2">
+<h2>Plot results:</h2>
+<p>I want to plot the number of peaks by proportion that are conserved similar to figure 1a in wang et al. 2018.</p>
+<pre class="r"><code>hTotal=456566
+cTotal= 360860
+hConprop= hTotal- 76207
+cConprop=cTotal- 76207 
+hUnConprop=hTotal - hConprop
+cUnConprop=cTotal- cConprop
+
+hum=c(hConprop,hUnConprop)
+chi=c(cConprop, cUnConprop)
+both=as.data.frame(rbind(hum, chi))
+colnames(both)=c(&quot;Conserved&quot;, &quot;Unconserved&quot;)
+both=both %&gt;% mutate( Species=c(&quot;Human&quot;, &quot;Chimp&quot;))
+both_melt=melt(both, id.vars=&quot;Species&quot;)
+
+pas_plot=ggplot(both_melt, aes(x=Species, fill=variable, y=value)) + geom_bar(stat=&quot;identity&quot;, position = &quot;fill&quot;) + labs(y=&quot;Proportion PAS Peaks&quot;, title=&quot;Conserved vs Unconserved PAS&quot;) + scale_fill_discrete(name=&quot;Peak Class&quot;) + annotate(&quot;text&quot;, x=1, y=.85, label=paste(&quot;Total PAS:&quot;, hTotal, sep=&quot; &quot;))+ annotate(&quot;text&quot;, x=2, y=.85, label=paste(&quot;Total PAS:&quot;, cTotal, sep=&quot; &quot;)) + annotate(&quot;text&quot;, x=1, y=.15, label=paste(&quot;Conserved PAS:&quot;, &quot;76207&quot;, sep=&quot; &quot;)) + annotate(&quot;text&quot;, x=2, y=.1, label=paste(&quot;Conserved PAS:&quot;, &quot;76207&quot;, sep=&quot; &quot;))
+
+pas_plot</code></pre>
+<p><img src="figure/liftover_pipeline.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>
 <pre class="r"><code>sessionInfo()</code></pre>
@@ -650,20 +721,28 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] workflowr_1.1.1 dplyr_0.7.6    
+ [1] bindrcpp_0.2.2  reshape2_1.4.3  forcats_0.3.0   stringr_1.3.1  
+ [5] purrr_0.2.5     readr_1.1.1     tidyr_0.8.1     tibble_1.4.2   
+ [9] ggplot2_3.0.0   tidyverse_1.2.1 workflowr_1.1.1 dplyr_0.7.6    
 
 loaded via a namespace (and not attached):
- [1] Rcpp_0.12.18      knitr_1.20        bindr_0.1.1      
- [4] whisker_0.3-2     magrittr_1.5      tidyselect_0.2.4 
- [7] R6_2.2.2          rlang_0.2.1       stringr_1.3.1    
-[10] tools_3.5.1       R.oo_1.22.0       git2r_0.23.0     
-[13] htmltools_0.3.6   yaml_2.1.19       rprojroot_1.3-2  
-[16] digest_0.6.15     assertthat_0.2.0  tibble_1.4.2     
-[19] crayon_1.3.4      bindrcpp_0.2.2    purrr_0.2.5      
-[22] R.utils_2.6.0     glue_1.3.0        evaluate_0.11    
-[25] rmarkdown_1.10    stringi_1.2.4     pillar_1.3.0     
-[28] compiler_3.5.1    backports_1.1.2   R.methodsS3_1.7.1
-[31] pkgconfig_2.0.1  </code></pre>
+ [1] tidyselect_0.2.4  haven_1.1.2       lattice_0.20-35  
+ [4] colorspace_1.3-2  htmltools_0.3.6   yaml_2.2.0       
+ [7] rlang_0.2.2       R.oo_1.22.0       pillar_1.3.0     
+[10] glue_1.3.0        withr_2.1.2       R.utils_2.7.0    
+[13] modelr_0.1.2      readxl_1.1.0      bindr_0.1.1      
+[16] plyr_1.8.4        munsell_0.5.0     gtable_0.2.0     
+[19] cellranger_1.1.0  rvest_0.3.2       R.methodsS3_1.7.1
+[22] evaluate_0.11     labeling_0.3      knitr_1.20       
+[25] broom_0.5.0       Rcpp_0.12.18      scales_1.0.0     
+[28] backports_1.1.2   jsonlite_1.5      hms_0.4.2        
+[31] digest_0.6.16     stringi_1.2.4     grid_3.5.1       
+[34] rprojroot_1.3-2   cli_1.0.0         tools_3.5.1      
+[37] magrittr_1.5      lazyeval_0.2.1    crayon_1.3.4     
+[40] whisker_0.3-2     pkgconfig_2.0.2   xml2_1.2.0       
+[43] lubridate_1.7.4   assertthat_0.2.0  rmarkdown_1.10   
+[46] httr_1.3.1        rstudioapi_0.7    R6_2.2.2         
+[49] nlme_3.1-137      git2r_0.23.0      compiler_3.5.1   </code></pre>
 </div>
 
 <!-- Adjust MathJax settings so that all math formulae are shown using

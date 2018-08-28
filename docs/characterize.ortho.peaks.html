@@ -346,13 +346,14 @@ div.section {
 </details>
 </li>
 <li>
-<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/8f61cee52fe61dfcffc4e0a2451b13512240efa4" target="_blank">8f61cee</a> </summary></p>
+<p><details> <summary> <strong style="color:blue;">✔</strong> <strong>Repository version:</strong> <a href="https://github.com/brimittleman/comparative_threeprime/tree/1ae2e492f4065a22b35889dcc5ce2cfba7f3841f" target="_blank">1ae2e49</a> </summary></p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility. The version displayed above was the version of the Git repository at the time these results were generated. <br><br> Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
 <pre><code>
 Ignored files:
     Ignored:    .RData
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
 
 Untracked files:
     Untracked:  com_threeprime.Rproj
@@ -396,6 +397,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left;">
+Rmd
+</td>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/1ae2e492f4065a22b35889dcc5ce2cfba7f3841f/analysis/characterize.ortho.peaks.Rmd" target="_blank">1ae2e49</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-28
+</td>
+<td style="text-align:left;">
+fix format
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+html
+</td>
+<td style="text-align:left;">
+<a href="https://cdn.rawgit.com/brimittleman/comparative_threeprime/1f8f5b1864215c2499615ca0632c39b2f4b77630/docs/characterize.ortho.peaks.html" target="_blank">1f8f5b1</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-28
+</td>
+<td style="text-align:left;">
+Build site.
+</td>
+</tr>
 <tr>
 <td style="text-align:left;">
 Rmd
@@ -504,6 +539,7 @@ Build site.
 <p></details></p>
 <hr />
 <p>I will use this analysis for QC on the orthologous peaks called in the liftover pipeline analysis.</p>
+<p>First</p>
 <div id="distance-to-ortho-exon" class="section level2">
 <h2>Distance to ortho exon</h2>
 <p>I want to make sure the distances of the orthologous peaks to the nearest exon called in Bryans ortho exon files follow a similar distribution.</p>
@@ -651,8 +687,9 @@ brimittleman
 </tbody>
 </table>
 <p></details></p>
-<div id="how-many-per-gene" class="section level3">
-<h3>How many per gene:</h3>
+</div>
+<div id="how-many-per-gene" class="section level2">
+<h2>How many per gene:</h2>
 <p>This is the code from the human apa qtl study. I used this to count how many peaks map to each gene. I will do this for the human and chimp here.</p>
 <pre class="bash"><code>#!/bin/bash
 
@@ -799,6 +836,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/1f8f5b1864215c2499615ca0632c39b2f4b77630/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-14-1.png" target="_blank">1f8f5b1</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/brimittleman/comparative_threeprime/blob/a23786505be6da399bd69014fa9a9e5e19902880/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-14-1.png" target="_blank">a237865</a>
 </td>
 <td style="text-align:left;">
@@ -851,7 +899,38 @@ summary(chimp_peakperexon$numPeaks)</code></pre>
 <pre class="r"><code>humanPPE=ggplot(human_peakperexon, aes(x=numPeaks)) + geom_density(fill=&quot;Red&quot;) + labs(title=&quot;Peaks per Exon \n Human&quot;)
 chimpPPE=ggplot(chimp_peakperexon, aes(x=numPeaks)) + geom_density(fill=&quot;Blue&quot;) + labs(title=&quot;Peaks per Exon \n Chimp &quot;)
 plot_grid(humanPPE, chimpPPE)</code></pre>
-<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /> Most of the exons have 0 peaks. This is expected. I want to look at how many 0s, 1s ect we have in each data set.</p>
+<p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<details> <summary><em>Expand here to see past versions of unnamed-chunk-17-1.png:</em></summary>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/1f8f5b1864215c2499615ca0632c39b2f4b77630/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-17-1.png" target="_blank">1f8f5b1</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-28
+</td>
+</tr>
+</tbody>
+</table>
+<p></details></p>
+<p>Most of the exons have 0 peaks. This is expected. I want to look at how many 0s, 1s ect we have in each data set.</p>
 <pre class="r"><code>human_exoncounts=human_peakperexon %&gt;% count(numPeaks)
 
 chimp_exoncounts=chimp_peakperexon %&gt;% count(numPeaks)
@@ -885,6 +964,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/1f8f5b1864215c2499615ca0632c39b2f4b77630/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-18-1.png" target="_blank">1f8f5b1</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/brimittleman/comparative_threeprime/blob/a23786505be6da399bd69014fa9a9e5e19902880/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-18-1.png" target="_blank">a237865</a>
 </td>
 <td style="text-align:left;">
@@ -899,8 +989,8 @@ brimittleman
 <p></details></p>
 </div>
 </div>
-<div id="distance-to-tes" class="section level3">
-<h3>Distance to TES</h3>
+<div id="distance-to-tes" class="section level2">
+<h2>Distance to TES</h2>
 <p>I want to look at the peaks distance to annotated gene TES in each species. I can make TES files by using the gene file. I need to take into account the strand. For the pos strand I use the end but for the neg strand I need to use the start. The easiest way to do this is in python. The scripts are called human_tes.py and chimp_tes.py</p>
 <pre class="bash"><code>#!/bin/bash
 
@@ -951,6 +1041,17 @@ Date
 <tbody>
 <tr>
 <td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/1f8f5b1864215c2499615ca0632c39b2f4b77630/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-21-1.png" target="_blank">1f8f5b1</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 <a href="https://github.com/brimittleman/comparative_threeprime/blob/a23786505be6da399bd69014fa9a9e5e19902880/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-21-1.png" target="_blank">a237865</a>
 </td>
 <td style="text-align:left;">
@@ -995,7 +1096,36 @@ huTES2=ggplot(human_TES2dis, aes(x=logdis)) + geom_density(fill=&quot;red&quot;)
 
 plot_grid(huTES2, chTES2)</code></pre>
 <p><img src="figure/characterize.ortho.peaks.Rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
-</div>
+<details> <summary><em>Expand here to see past versions of unnamed-chunk-24-1.png:</em></summary>
+<table style="border-collapse:separate; border-spacing:5px;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Version
+</th>
+<th style="text-align:left;">
+Author
+</th>
+<th style="text-align:left;">
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+<a href="https://github.com/brimittleman/comparative_threeprime/blob/1f8f5b1864215c2499615ca0632c39b2f4b77630/docs/figure/characterize.ortho.peaks.Rmd/unnamed-chunk-24-1.png" target="_blank">1f8f5b1</a>
+</td>
+<td style="text-align:left;">
+brimittleman
+</td>
+<td style="text-align:left;">
+2018-08-28
+</td>
+</tr>
+</tbody>
+</table>
+<p></details></p>
 </div>
 <div id="session-information" class="section level2">
 <h2>Session information</h2>

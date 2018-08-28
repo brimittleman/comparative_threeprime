@@ -9,7 +9,9 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-I will use this analysis for QC on the orthologous peaks called in the liftover pipeline analysis.  
+I will use this analysis for QC on the orthologous peaks called in the liftover pipeline analysis.
+
+First 
 
 ##Distance to ortho exon 
 
@@ -112,7 +114,7 @@ hg19_dist=read.table("../data/dist_upexon/hg19.humanpeaks.distUpstreamexon.txt",
 ggplot(hg19_dist, aes(x=logdis)) + geom_density()+ labs(x="log10 abs.value \n distance +1 ", title="Hg19 peaks dist to upstream exon")
 ```
 
-###How many per gene:  
+##How many per gene:  
 
 
 This is the code from the human apa qtl study. I used this to count how many peaks map to each gene. I will do this for the human and chimp here.  
@@ -305,7 +307,7 @@ both_exon_melt=melt(both_exon, measure.vars =c("Human", "Chimp"))
 ggplot(both_exon_melt, aes(x=PeakNum, y=value, col=variable)) + geom_point( size=3) + facet_grid(~variable) + labs(y="Exons", title="Number of peaks per conserved exons")
 ```
 
-###Distance to TES  
+##Distance to TES  
 
 I want to look at the peaks distance to annotated gene TES in each species. I can make TES files by using the gene file. I need to take into account the strand. For the pos strand I use the end but for the neg strand I need to use the start.  The easiest way to do this is in python. The scripts are called human_tes.py and chimp_tes.py  
 

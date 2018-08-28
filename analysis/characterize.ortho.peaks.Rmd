@@ -175,10 +175,10 @@ bedtools map -c 4 -o count_distinct -a /project2/gilad/briana/genome_anotation_d
 
 
 ```{r}
-human_peakpergene= read.table("../data/PeakPerGene/humanOrthoPeakPerGene.bed", header=F, stringsAsFactors = F,col.names = c("chr", "start", "end", "gene", "score", "strand", "numPeaks")) %>% mutate(spec= "H") %>% filter(numPeaks > 0)
+human_peakpergene= read.table("../data/PeakPerGene/humanOrthoPeakPerGene.bed", header=F, stringsAsFactors = F,col.names = c("chr", "start", "end", "gene", "score", "strand", "numPeaks")) %>% mutate(spec= "H") 
 
 summary(human_peakpergene$numPeaks)
-chimp_peakpergene= read.table("../data/PeakPerGene/chimpOrthoPeakPerGene.bed", stringsAsFactors = F, header = F, col.names = c("chr", "start", "end", "gene", "score", "strand", "numPeaks")) %>% mutate(spec="C") %>% filter(numPeaks > 0)
+chimp_peakpergene= read.table("../data/PeakPerGene/chimpOrthoPeakPerGene.bed", stringsAsFactors = F, header = F, col.names = c("chr", "start", "end", "gene", "score", "strand", "numPeaks")) %>% mutate(spec="C") 
 
 
 summary(chimp_peakpergene$numPeaks)
@@ -190,8 +190,58 @@ chimpPPG=ggplot(chimp_peakpergene, aes(x=log10(numPeaks))) + geom_density(fill="
 plot_grid(humanPPG, chimpPPG)
 ```
 
+####Genes with conserved PAS 
 
+I will follow a similar strategy to Wang et al. 2018 to make a plot similar to plot 1d. I want the percent of genes in both species with conserved PAS.  
+
+```{r}
+chimp_peakpergene= chimp_peakpergene %>% mutate(oneConservedPeak=ifelse(numPeaks==1, 1, 0 )) %>% mutate(multConservedPeak= ifelse(numPeaks > 1, 1, 0))
+
+
+Cgenes1peak=sum(chimp_peakpergene$oneConservedPeak)/nrow(chimp_peakpergene)
+CgenesMultpeak=sum(chimp_peakpergene$multConservedPeak)/nrow(chimp_peakpergene)
+Cgenes0peak=1- CgenesMultpeak - Cgenes1peak
+
+human_peakpergene = human_peakpergene %>% mutate(oneConservedPeak=ifelse(numPeaks==1, 1,0)) %>% mutate(multConservedPeak=ifelse(numPeaks >1,1,0))
+
+
+Hgenes1peak=sum(human_peakpergene$oneConservedPeak) / nrow(human_peakpergene) 
+HgenesMultpeak=sum(human_peakpergene$multConservedPeak)/ nrow(human_peakpergene)
+Hgenes0peak=1- HgenesMultpeak - Hgenes1peak
+```
+
+
+I want to create a data frame with these numbers to plot it.  
+
+```{r}
+Hgene_peak=c(Hgenes0peak,Hgenes1peak,HgenesMultpeak)
+Cgene_peak=c(Cgenes0peak, Cgenes1peak, CgenesMultpeak)
+both_gene_peak=as.data.frame(rbind(Hgene_peak, Cgene_peak))
+colnames(both_gene_peak)= c("ZeroConserved", "OneConserved", "MultConserved")
+rownames(both_gene_peak)=c("Human", "Chimp")
+both_gene_peak= both_gene_peak %>% rownames_to_column(var="Species")
+
+both_gene_peak_melt=melt(both_gene_peak, id.vars ="Species")
+
+#add average number of conserved peak per gene 
+avgH=round(mean(human_peakpergene$numPeaks),digits = 3)
+avgC=round(mean(chimp_peakpergene$numPeaks),digits = 3)
+
+```
+Plot this:  
+
+```{r}
+genepeakplot= ggplot(both_gene_peak_melt, aes(x=Species, fill=variable, y=value)) + geom_bar(stat="identity", position = "fill") + labs(y="Prop of Protein Coding Genes", title="Conserved peaks \n in protein coding genes") + scale_fill_discrete(name = "Number of \nConserved Peaks", labels=c("Zero","One", "Multiple")) + annotate("text", x=1, y=.8, label= paste("avg peaks\n per gene \n", avgH, sep=" ")) + annotate("text", x = 2, y=.8, label = paste("avg peaks\n per gene \n", avgC, sep=" "))
+  
+genepeakplot
+
+```
+
+
+####Conserved exons 
 I can run similar code on the conserved exons. We expect similar distribution but most of the exons will have 0. This is the primary reason to use conserved peaks in three prime bias data.  
+
+
 
 ```{bash, eval=F}
 #!/bin/bash

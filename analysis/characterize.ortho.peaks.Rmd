@@ -11,7 +11,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 I will use this analysis for QC on the orthologous peaks called in the liftover pipeline analysis.
 
-First 
 
 ##Distance to ortho exon 
 

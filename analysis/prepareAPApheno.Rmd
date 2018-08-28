@@ -1,0 +1,115 @@
+---
+title: "prepare APA phenotype"
+author: "Briana Mittleman"
+date: "8/28/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In this analysis I want to assign all of the orthologus peaks to the human and chimp mRNAs. Once I do this I will be able to create a PAS usage phenotype. This is x/y. X is the read count in a peak and y is the number of reads in any peak for the same gene. This analysis will follow a similar pipeline to https://brimittleman.github.io/threeprimeseq/pheno.leaf.comb.html.  I will run all of this seperatly for the human and chimp peaks. Unfortunately I cannot forse strandedness here like I did in the human LCL. I lost the strand information in the liftover.  
+
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=intGenes_orthopeaks
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=intGenes_orthopeaks.out
+#SBATCH --error=intGenes_orthopeaks.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+
+#human
+bedtools intersect -wa -wb -sorted -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/humanOrthoPeaks.sort.bed  -b /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/humanGene_ncbiRefSeq_mRNA_sort.bed > /project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/humanOrthoPeaks.sort.refseqgenes.bed 
+
+
+#chimp
+bedtools intersect -wa -wb -sorted -a /project2/gilad/briana/comparitive_threeprime/data/ortho_peaks/chimpOrthoPeaks.sort.bed -b /project2/gilad/briana/genome_anotation_data/comp_genomes/gene_annos/chimpGene_refGene_mRNA_sort.bed > /project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/chimpOrthoPeaks.sort.refgenes.bed
+
+```
+
+The resulting file has info from everything. I need to use awk to keep just the colums I want.  chr, start, end, peak name, ".", gene strand, gene name. The first . is for a score and the second . is strand.  
+
+```{bash, eval=F}
+awk '{print $1 "\t" $2 "\t" $3 "\t" $4 "\t " "." "\t" $10 "\t" $8}' /project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/chimpOrthoPeaks.sort.refgenes.bed > /project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/chimpOrthoPeaks.sort.refgenes.sm.bed
+
+awk '{print $1 "\t" $2 "\t" $3 "\t" $4 "\t " "." "\t" $10 "\t" $8}' /project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/humanOrthoPeaks.sort.refseqgenes.bed  > /project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/humanOrthoPeaks.sort.refseqgenes.sm.bed 
+
+```
+
+Before I run feature count I want to create an ID for each peak and transform the data into a SAF file. The ID will be peak#:ch#:start:end:strand:gene  
+
+
+```{bash,eval=F}
+#peakwGene2Saf_C.py  
+from misc_helper import *
+
+fout = file("/project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/chimpOrthoPeaks.sort.refgenes.sm.SAF",'w')
+fout.write("GeneID\tChr\tStart\tEnd\tStrand\n")
+for ln in open("/project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/chimpOrthoPeaks.sort.refgenes.sm.bed"):
+    chrom, start, end, name, score, strand, gene = ln.split()
+    start_i=int(start)
+    end_i=int(end)
+    ID = "%s:%s:%d:%d:%s:%s"%(name, chrom, start_i, end_i, strand, gene)
+    fout.write("%s\t%s\t%d\t%d\t%s\n"%(ID, chrom, start_i, end_i, strand))
+fout.close()
+
+#peakwGene2Saf_H.py
+from misc_helper import *
+
+fout = file("/project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/humanOrthoPeaks.sort.refseqgenes.sm.SAF",'w')
+fout.write("GeneID\tChr\tStart\tEnd\tStrand\n")
+for ln in open("/project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/humanOrthoPeaks.sort.refseqgenes.sm.bed"):
+    chrom, start, end, name, score, strand, gene = ln.split()
+    start_i=int(start)
+    end_i=int(end)
+    ID = "%s:%s:%d:%d:%s:%s"%(name, chrom, start_i, end_i, strand, gene)
+    fout.write("%s\t%s\t%d\t%d\t%s\n"%(ID, chrom, start_i, end_i, strand))
+fout.close()
+```
+
+
+Feature counts on these peaks.  
+
+fc_orthopeaksWgene.sh
+
+```{bash, eval=F}
+#!/bin/bash
+
+#SBATCH --job-name=fc_orthopeaksWgene
+#SBATCH --account=pi-yangili1
+#SBATCH --time=24:00:00
+#SBATCH --output=fc_orthopeaksWgene.out
+#SBATCH --error=fc_orthopeaksWgene.err
+#SBATCH --partition=broadwl
+#SBATCH --mem=12G
+#SBATCH --mail-type=END
+
+
+module load Anaconda3
+source activate comp_threeprime_env
+
+# outdir: /project2/gilad/briana/comparitive_threeprime/data/PeakwGene_quant
+
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/humanOrthoPeaks.sort.refseqgenes.sm.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/PeakwGene_quant/HumanTotal_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/human/data/sort/*T-sort.bam -s 1
+
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/humanOrthoPeaks.sort.refseqgenes.sm.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/PeakwGene_quant/HumanNuclear_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/human/data/sort/*N-sort.bam -s 1
+
+
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/chimpOrthoPeaks.sort.refgenes.sm.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/PeakwGene_quant/ChimpTotal_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/chimp/data/sort/*T-sort.bam -s 1
+
+featureCounts -a /project2/gilad/briana/comparitive_threeprime/data/PeaksGeneAnno/chimpOrthoPeaks.sort.refgenes.sm.SAF -F SAF -o /project2/gilad/briana/comparitive_threeprime/data/PeakwGene_quant/ChimpNuclear_Orthopeak.quant /project2/gilad/briana/comparitive_threeprime/chimp/data/sort/*N-sort.bam -s 1
+
+```
+
+This leads to loss a large number of reads most likely because they fall outside of the orthologous peaks or in peaks not assigned to genes. This is a huge problem in the chimps because there are only 2000 annotated genes.  
+
+

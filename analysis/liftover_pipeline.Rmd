@@ -145,6 +145,8 @@ The final lifted files have 350111 peaks that lifted from chimp to human and 442
 ```{r}
 library(dplyr)
 library(workflowr)
+library(tidyverse)
+library(reshape2)
 ```
 
 
@@ -209,4 +211,27 @@ write.table(chimp_ortho, file="../data/liftover/chimpOrthoPeaks.bed", quote= F, 
 write.table(peak_names, file="../data/liftover/HumanChimpPeaknames.txt", quote=F, row.names = F, col.names = T, sep="\t")
 ```
 
+##Plot results:  
+
+I want to plot the number of peaks by proportion that are conserved similar to figure 1a in wang et al. 2018.  
+
+```{r}
+hTotal=456566
+cTotal= 360860
+hConprop= hTotal- 76207
+cConprop=cTotal- 76207 
+hUnConprop=hTotal - hConprop
+cUnConprop=cTotal- cConprop
+
+hum=c(hConprop,hUnConprop)
+chi=c(cConprop, cUnConprop)
+both=as.data.frame(rbind(hum, chi))
+colnames(both)=c("Conserved", "Unconserved")
+both=both %>% mutate( Species=c("Human", "Chimp"))
+both_melt=melt(both, id.vars="Species")
+
+pas_plot=ggplot(both_melt, aes(x=Species, fill=variable, y=value)) + geom_bar(stat="identity", position = "fill") + labs(y="Proportion PAS Peaks", title="Conserved vs Unconserved PAS") + scale_fill_discrete(name="Peak Class") + annotate("text", x=1, y=.85, label=paste("Total PAS:", hTotal, sep=" "))+ annotate("text", x=2, y=.85, label=paste("Total PAS:", cTotal, sep=" ")) + annotate("text", x=1, y=.15, label=paste("Conserved PAS:", "76207", sep=" ")) + annotate("text", x=2, y=.1, label=paste("Conserved PAS:", "76207", sep=" "))
+
+pas_plot
+```
 
